@@ -3,6 +3,10 @@ package org.example;
 public class ServicioNomina {
 
     public Boolean addHorasTrabajadas(Empleado empleado, int horasTrabajadas) {
+        if (horasTrabajadas < 1) {
+            throw new IllegalArgumentException("Horas trabajadas no puede ser menor que 1");
+        }
+
         if (empleado.getTipoEmpleado() == TipoEmpleado.PART_TIME && empleado.getHorasTrabajadas() + horasTrabajadas > 40) {
             return false;
         }
@@ -11,6 +15,10 @@ public class ServicioNomina {
     }
 
     public double calcularSalario(Empleado empleado) {
+        if (empleado == null) {
+            throw new IllegalArgumentException("Empleado no puede ser nulo");
+        }
+
         double salario = 0;
         if (empleado.getHorasTrabajadas() > 40){
             int horasExtra = empleado.getHorasTrabajadas() - 40;
@@ -18,6 +26,11 @@ public class ServicioNomina {
         }else {
             salario = empleado.getHorasTrabajadas() * empleado.getTarifaPorHora();
         }
+
+        if (empleado.getSalarioLimitado() && salario > 20000){
+            throw new LimitiSalarioSurpassed("Empleado no tiene permitido ganar mas de 20,000 semanal");
+        }
+
         return salario;
     }
 }
