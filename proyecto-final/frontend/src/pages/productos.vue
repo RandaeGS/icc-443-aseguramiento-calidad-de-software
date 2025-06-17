@@ -131,9 +131,11 @@
 <script lang="ts" setup>
 import type { Producto } from "@/models/Producto";
 import { ref } from "vue";
+import axiosInstance from "@/plugins/axios";
 
 // Formulario
 const form = ref(null);
+const isEditingMode = ref<boolean>(false);
 
 const productoForm = reactive<Producto>({
   id: undefined,
@@ -157,8 +159,16 @@ const categoriaItems = [
 ];
 
 // Funciones de formulario
-const handleSubmit = () => {
-  if (form.value.validate()) console.log(productoForm);
+const handleSubmit = async () => {
+  if (form.value.validate()) {
+    console.log("hola");
+    return;
+  }
+  if (!isEditingMode.value) {
+    await axiosInstance.post("/productos");
+  } else {
+    await axiosInstance.put("/productos");
+  }
 };
 
 const newFormulario = () => {
