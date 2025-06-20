@@ -90,7 +90,6 @@
                 prepend-icon="$vuetify"
                 v-model="productoForm.beneficio"
                 variant="outlined"
-                :rules="[rules.required]"
                 :precision="2"
                 control-variant="hidden"
                 :min="0"
@@ -160,20 +159,58 @@ const categoriaItems = [
 
 // Funciones de formulario
 const handleSubmit = async () => {
-  if (form.value.validate()) {
-    console.log("hola");
+  await form.value.validate();
+  if (!form.value.isValid) {
+    console.log("Formulario invalido");
     return;
   }
+
+  let response: any = undefined;
   if (!isEditingMode.value) {
-    await axiosInstance.post("/productos");
+    response = await axiosInstance.post("/productos", productoForm);
+    console.log(response);
+    newFormulario();
   } else {
-    await axiosInstance.put("/productos");
+    response = await axiosInstance.put("/productos", productoForm);
+    console.log(response);
+    newFormulario();
   }
 };
 
-const newFormulario = () => {
+const newFormulario = async () => {
+  productoForm.id = undefined;
+  productoForm.nombre = "";
+  productoForm.descripcion = "";
+  productoForm.categoria = "";
+  productoForm.precio = 0;
+  productoForm.costo = 0;
+  productoForm.beneficio = 0;
+  productoForm.cantidadInicial = 0;
+  productoForm.impuesto = undefined;
+
+  await nextTick();
   form.value.resetValidation();
 };
+
+const calcularBeneficio = () => {
+  const precio = Number(productoForm.precio) || 0;
+  const costo = Number(productoForm.costo) || 0;
+  const impuesto = Number(productoForm.impuesto) || 0;
+
+  const margen = precio - costo;
+  const factorImpuesto = 1 - impuesto / 100;
+  const beneficio = margen * factorImpuesto;
+
+  return Math.max(0, Number(beneficio.toFixed(2)));
+};
+
+watch(
+  () => [productoForm.precio, productoForm.costo, productoForm.impuesto],
+  () => {
+    productoForm.beneficio = calcularBeneficio();
+  },
+  { immediate: true },
+);
 
 // Reglas
 const rules = {

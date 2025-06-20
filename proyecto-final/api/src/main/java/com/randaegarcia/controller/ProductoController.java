@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 
 @Path("/productos")
@@ -17,15 +18,16 @@ public class ProductoController {
 
     private final ProductoService productoService;
 
-    @Path("{id}")
     @GET
+    @Path("{id}")
     public Producto findProductoById(@PathParam("id") Long id) {
         return productoService.findById(id);
     }
 
     @POST
     @Transactional
-    public Producto createProducto(@NotNull @Valid Producto producto) {
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response createProducto(@NotNull @Valid Producto producto) {
         return productoService.save(producto);
     }
 }

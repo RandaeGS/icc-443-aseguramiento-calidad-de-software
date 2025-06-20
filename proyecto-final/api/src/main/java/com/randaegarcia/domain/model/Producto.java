@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 public class Producto extends PanacheEntity {
     @NotNull
     @Size(min = 3, max = 100)
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     public String nombre;
     @NotNull
     @Size(min = 3, max = 100)
@@ -35,4 +35,11 @@ public class Producto extends PanacheEntity {
     @PositiveOrZero
     @Column(nullable = false)
     public Long cantidadInicial;
+    @PositiveOrZero
+    @Column
+    public Integer impuesto;
+
+    public static Producto findByNombre(String nombre){
+        return find("nombre = ?1", nombre).firstResult();
+    }
 }
