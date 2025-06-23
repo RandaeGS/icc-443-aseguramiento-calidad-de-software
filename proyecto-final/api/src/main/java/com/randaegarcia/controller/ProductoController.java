@@ -10,6 +10,9 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
+import org.jboss.resteasy.reactive.RestQuery;
+
+import java.util.List;
 
 @Path("/productos")
 @Produces(MediaType.APPLICATION_JSON)
@@ -17,6 +20,11 @@ import lombok.RequiredArgsConstructor;
 public class ProductoController {
 
     private final ProductoService productoService;
+
+    @GET
+    public Response findAll(@QueryParam("page") @DefaultValue("0") int page,  @QueryParam("size") @DefaultValue("10") int size) {
+        return productoService.findAll(page, size);
+    }
 
     @GET
     @Path("{id}")

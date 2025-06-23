@@ -6,9 +6,9 @@ import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -23,6 +23,9 @@ public class Producto extends PanacheEntity {
     @Size(min = 3, max = 100)
     @Column(nullable = false)
     public String descripcion;
+    @NotNull
+    @Column(nullable = false)
+    public String categoria;
     @PositiveOrZero
     @Column(nullable = false)
     public Double precio;
@@ -38,6 +41,16 @@ public class Producto extends PanacheEntity {
     @PositiveOrZero
     @Column
     public Integer impuesto;
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    @Column(name = "is_borrado")
+    public Boolean isBorrado;
+
+    public static List<Producto> findAllPaginated(int page, int size) {
+        return findAll()
+                .page(page, size)
+                .list();
+    }
 
     public static Producto findByNombre(String nombre){
         return find("nombre = ?1", nombre).firstResult();
