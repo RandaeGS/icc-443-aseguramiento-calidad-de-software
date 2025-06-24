@@ -1,6 +1,6 @@
 <template>
   <div>
-    <header class="bg-slate-700 p-1">
+    <header class="bg-slate-700 p-1 grow-0">
       <nav class="flex justify-between">
         <div class="flex content-center gap-1">
           <Button aria-label="Bookmark" icon="pi pi-bars" severity="secondary" variant="text" />
@@ -26,7 +26,7 @@
       </nav>
     </header>
 
-    <main class="flex grow min-h-0">
+    <main class="flex grow">
       <div class="flex flex-col grow mt-2 max-w-3/12">
         <div class="flex">
           <InputGroup>
@@ -46,7 +46,10 @@
             :key="item.id"
             class="flex flex-col mt-2"
           >
-            <div class="flex items-center bg-slate-500 text-white p-2 rounded">
+            <div
+              class="flex items-center bg-slate-500 text-white p-2 rounded hover:bg-sky-700 transition-colors"
+              @click="selectProducto(item)"
+            >
               <i class="pi pi-box mr-2" style="font-size: 1.5rem"></i>
               <div class="flex flex-col grow">
                 <p class="font-semibold">{{ item.nombre }}</p>
@@ -61,8 +64,9 @@
         <Paginator
           :rows="10"
           :totalRecords="productoList.totalElements"
-          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}"
+          currentPageReportTemplate="{first} a {last} de {totalRecords}"
           template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
+          @page="paginar"
         />
       </div>
 
@@ -79,7 +83,7 @@
           <!-- Column 1 -->
           <div class="flex flex-col gap-4 grow">
             <FloatLabel variant="on">
-              <InputText v-model="productoForm.id" fluid name="id" type="text" />
+              <InputText v-model="productoForm.id" fluid name="id" readonly type="text" />
               <label for="codigo">Codigo</label>
             </FloatLabel>
 
@@ -216,7 +220,7 @@
 </template>
 
 <script lang="ts" setup>
-import { nextTick, onMounted, reactive, ref } from 'vue'
+import { nextTick, onMounted, reactive, ref, watch } from 'vue'
 import type { Producto } from '@/models/Producto.ts'
 import axiosInstance from '@/plugins/axios.ts'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
@@ -231,6 +235,7 @@ onMounted(() => {
 const formRef = ref(null)
 const page = ref<number>(0)
 const size = ref<number>(10)
+
 const productoForm = reactive<Producto>({
   id: undefined,
   nombre: '',
@@ -244,12 +249,32 @@ const productoForm = reactive<Producto>({
 })
 
 // Form
-const onFormSubmit = ({ valid }) => {
-  console.log('formSubmit', valid)
+const onFormSubmit = async ({ valid }) => {
+  if (valid) {
+    try {
+      let response
+      if (productoForm.id) {
+        response = await axiosInstance.put('/productos', productoForm)
+        console.log(response)
+      } else {
+        response = await axiosInstance.post('/productos', productoForm)
+        console.log(response)
+      }
+      await newFormulario()
+      await loadList()
+    } catch (error) {
+      console.log(error)
+    }
+  }
+}
+
+const selectProducto = (producto: Producto): void => {
+  console.log(producto)
+  Object.assign(productoForm, producto)
 }
 
 const submitForm = () => {
-  console.log(formRef.value.submit())
+  console.log(formRef.value?.submit())
 }
 
 const newFormulario = async () => {
@@ -282,10 +307,23 @@ const resolver = ref(
   ),
 )
 
+const calcularBeneficio = () => {
+  const precio = Number(productoForm.precio) || 0
+  const costo = Number(productoForm.costo) || 0
+  const impuesto = Number(productoForm.impuesto) || 0
+
+  const margen = precio - costo
+  const factorImpuesto = 1 - impuesto / 100
+  const beneficio = margen * factorImpuesto
+
+  return Math.max(0, Number(beneficio.toFixed(2)))
+}
+
 // List
 const productoList = ref<Producto[]>([])
 const impuestoList = [0, 11, 18]
 const categoriaList = ['Electrodomesticos', 'Medicina', 'Ropa', 'Varios']
+
 const loadList = async () => {
   try {
     const response = await axiosInstance.get('/productos', {
@@ -300,6 +338,21 @@ const loadList = async () => {
     console.error(error)
   }
 }
+
+const paginar = async (paginator: object) => {
+  page.value = paginator.page
+  size.value = paginator.rows
+  await loadList()
+}
+
+// Watchers
+watch(
+  () => [productoForm.precio, productoForm.costo, productoForm.impuesto],
+  () => {
+    productoForm.beneficio = calcularBeneficio()
+  },
+  { immediate: true },
+)
 </script>
 
 <style></style>

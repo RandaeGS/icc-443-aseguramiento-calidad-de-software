@@ -25,6 +25,7 @@ public class ProductoService {
         if (Producto.findByNombre(producto.getNombre()) != null) {
             throw new ConflictException("Nombre de producto ya existe");
         }
+        producto.isBorrado = false;
         producto.persist();
         return Response.ok(producto).build();
     }
