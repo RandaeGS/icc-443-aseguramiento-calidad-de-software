@@ -38,4 +38,11 @@ public class ProductoController {
     public Response createProducto(@NotNull @Valid Producto producto) {
         return productoService.save(producto);
     }
+
+    @Path("{id}")
+    @DELETE
+    @Transactional
+    public Response deleteProducto(@PathParam("id") Long id) {
+        return productoService.deleteProducto(id);
+    }
 }

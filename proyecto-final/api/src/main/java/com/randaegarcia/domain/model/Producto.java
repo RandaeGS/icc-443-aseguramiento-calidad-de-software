@@ -15,39 +15,48 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 public class Producto extends PanacheEntity {
+
     @NotNull
     @Size(min = 3, max = 100)
     @Column(nullable = false, unique = true)
     public String nombre;
+
     @NotNull
     @Size(min = 3, max = 100)
     @Column(nullable = false)
     public String descripcion;
+
     @NotNull
     @Column(nullable = false)
     public String categoria;
+
     @PositiveOrZero
     @Column(nullable = false)
     public Double precio;
+
     @PositiveOrZero
     @Column(nullable = false)
     public Double costo;
+
     @NotNull
     @Column(nullable = false)
     public Double beneficio;
+
     @PositiveOrZero
     @Column(nullable = false)
     public Long cantidadInicial;
+
     @PositiveOrZero
     @Column
     public Integer impuesto;
+
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     @Column(name = "is_borrado")
     public Boolean isBorrado;
 
     public static List<Producto> findAllPaginated(int page, int size) {
-        return findAll()
+        return find("isBorrado", false)
                 .page(page, size)
                 .list();
     }

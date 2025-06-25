@@ -3,22 +3,37 @@
     <header class="bg-slate-700 p-1 grow-0">
       <nav class="flex justify-between">
         <div class="flex content-center gap-1">
-          <Button aria-label="Bookmark" icon="pi pi-bars" severity="secondary" variant="text" />
+          <Button
+            aria-label="Bookmark"
+            icon="pi pi-bars"
+            severity="secondary"
+            variant="text"
+            @click="showList = !showList"
+          />
           <h2 class="text-2xl font-bold content-center">Productos</h2>
         </div>
-        <div>
+        <div class="content-center">
           <ButtonGroup>
-            <Button icon="pi pi-trash" label="Eliminar" severity="danger"></Button>
+            <Button
+              icon="pi pi-trash"
+              label="Eliminar"
+              severity="danger"
+              size="small"
+              @click="deleteProducto"
+              v-if="buttonState.eliminar"
+            ></Button>
             <Button
               icon="pi pi-refresh"
               label="Nuevo"
               severity="secondary"
+              size="small"
               @click="newFormulario"
             ></Button>
             <Button
               icon="pi pi-save"
               label="Salvar"
               severity="success"
+              size="small"
               @click="submitForm"
             ></Button>
           </ButtonGroup>
@@ -27,48 +42,50 @@
     </header>
 
     <main class="flex grow">
-      <div class="flex flex-col grow mt-2 max-w-3/12">
-        <div class="flex">
-          <InputGroup>
-            <InputText placeholder="Buscar" />
-            <Button icon="pi pi-search" />
-          </InputGroup>
-        </div>
-
-        <div class="flex flex-col grow">
-          <div v-if="productoList.length === 0" class="text-center text-gray-500">
-            No hay productos disponibles
+      <Transition name="slide-width">
+        <div class="flex flex-col grow mt-2 max-w-3/12" v-if="showList">
+          <div class="flex">
+            <InputGroup>
+              <InputText placeholder="Buscar" />
+              <Button icon="pi pi-search" />
+            </InputGroup>
           </div>
 
-          <div
-            v-for="item in productoList.content"
-            v-else
-            :key="item.id"
-            class="flex flex-col mt-2"
-          >
+          <div class="flex flex-col grow">
+            <div v-if="productoList.length === 0" class="text-center text-gray-500">
+              No hay productos disponibles
+            </div>
+
             <div
-              class="flex items-center bg-slate-500 text-white p-2 rounded hover:bg-sky-700 transition-colors"
-              @click="selectProducto(item)"
+              v-for="item in productoList.content"
+              v-else
+              :key="item.id"
+              class="flex flex-col mt-2"
             >
-              <i class="pi pi-box mr-2" style="font-size: 1.5rem"></i>
-              <div class="flex flex-col grow">
-                <p class="font-semibold">{{ item.nombre }}</p>
-                <p class="text-sm">ID: {{ item.id }}</p>
-                <p class="text-sm">Precio: {{ item.precio }}$RD</p>
+              <div
+                class="flex items-center bg-slate-500 text-white p-2 rounded hover:bg-sky-700 transition-colors"
+                @click="selectProducto(item)"
+              >
+                <i class="pi pi-box mr-2" style="font-size: 1.5rem"></i>
+                <div class="flex flex-col grow">
+                  <p class="font-semibold">{{ item.nombre }}</p>
+                  <p class="text-sm">ID: {{ item.id }}</p>
+                  <p class="text-sm">Precio: {{ item.precio }}$RD</p>
+                </div>
+                <p class="text-sm">{{ item.categoria }}</p>
               </div>
-              <p class="text-sm">{{ item.categoria }}</p>
             </div>
           </div>
-        </div>
 
-        <Paginator
-          :rows="10"
-          :totalRecords="productoList.totalElements"
-          currentPageReportTemplate="{first} a {last} de {totalRecords}"
-          template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
-          @page="paginar"
-        />
-      </div>
+          <Paginator
+            :rows="10"
+            :totalRecords="productoList.totalElements"
+            currentPageReportTemplate="{first} a {last} de {totalRecords}"
+            template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
+            @page="paginar"
+          />
+        </div>
+      </Transition>
 
       <Form
         ref="formRef"
@@ -224,7 +241,11 @@ import { nextTick, onMounted, reactive, ref, watch } from 'vue'
 import type { Producto } from '@/models/Producto.ts'
 import axiosInstance from '@/plugins/axios.ts'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
-import { z } from 'zod' // Hooks
+import { z } from 'zod'
+import { useToast } from 'primevue' // Hooks
+
+// Uses
+const toast = useToast()
 
 // Hooks
 onMounted(() => {
@@ -235,6 +256,7 @@ onMounted(() => {
 const formRef = ref(null)
 const page = ref<number>(0)
 const size = ref<number>(10)
+const showList = ref<boolean>(false)
 
 const productoForm = reactive<Producto>({
   id: undefined,
@@ -262,9 +284,41 @@ const onFormSubmit = async ({ valid }) => {
       }
       await newFormulario()
       await loadList()
+      toast.add({
+        severity: 'success',
+        summary: 'Exito',
+        detail: 'Producto salvado correctamente',
+        life: 3000,
+      })
     } catch (error) {
       console.log(error)
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se pudo salvar el producto',
+        life: 3000,
+      })
     }
+  }
+}
+
+const deleteProducto = async () => {
+  try {
+    await axiosInstance.delete(`/productos/${productoForm?.id}`)
+    toast.add({
+      severity: 'success',
+      summary: 'Exito',
+      detail: 'Producto eliminado correctamente',
+      life: 3000,
+    })
+  } catch (error) {
+    console.log(error)
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'No se pudo eliminar el producto',
+      life: 3000,
+    })
   }
 }
 
@@ -290,22 +344,6 @@ const newFormulario = async () => {
 
   await nextTick()
 }
-
-const resolver = ref(
-  zodResolver(
-    z.object({
-      id: z.string().optional(),
-      nombre: z.string().min(3, { message: 'Campo requerido' }),
-      precio: z.number().gt(0, { message: 'Precio requerido' }),
-      costo: z.number().gt(0, { message: 'Costo requerido' }),
-      cantidadInicial: z.number().gte(0, { message: 'Cantidad inicial' }),
-      categoria: z.string().min(1, { message: 'Categoria requerido' }),
-      impuesto: z.number().optional(),
-      beneficio: z.number().optional(),
-      descripcion: z.string().min(3, { message: 'Descripcion requerido' }),
-    }),
-  ),
-)
 
 const calcularBeneficio = () => {
   const precio = Number(productoForm.precio) || 0
@@ -333,9 +371,14 @@ const loadList = async () => {
       },
     })
     productoList.value = response.data
-    console.log(productoList.value)
   } catch (error) {
     console.error(error)
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'No se pudieron cargar los productos',
+      life: 3000,
+    })
   }
 }
 
@@ -345,6 +388,23 @@ const paginar = async (paginator: object) => {
   await loadList()
 }
 
+// Notifications
+const resolver = ref(
+  zodResolver(
+    z.object({
+      id: z.string().optional(),
+      nombre: z.string().min(3, { message: 'Campo requerido' }),
+      precio: z.number().gt(0, { message: 'Precio requerido' }),
+      costo: z.number().gt(0, { message: 'Costo requerido' }),
+      cantidadInicial: z.number().gte(0, { message: 'Cantidad inicial' }),
+      categoria: z.string().min(1, { message: 'Categoria requerido' }),
+      impuesto: z.number().optional(),
+      beneficio: z.number().optional(),
+      descripcion: z.string().min(3, { message: 'Descripcion requerido' }),
+    }),
+  ),
+)
+
 // Watchers
 watch(
   () => [productoForm.precio, productoForm.costo, productoForm.impuesto],
@@ -353,6 +413,43 @@ watch(
   },
   { immediate: true },
 )
+
+// Buttons state
+const buttonState = reactive({
+  eliminar: false,
+  modificar: false,
+  salvar: true,
+})
+
+watch(
+  () => productoForm.id,
+  (newId) => {
+    const hasValidId = Number(newId) > 0
+    buttonState.eliminar = hasValidId
+    buttonState.modificar = hasValidId
+  },
+  { immediate: true },
+)
+
+// Computed
 </script>
 
-<style></style>
+<style>
+.slide-width-enter-active,
+.slide-width-leave-active {
+  transition:
+    max-width 0.4s ease,
+    opacity 0.3s ease;
+}
+
+.slide-width-enter-from,
+.slide-width-leave-to {
+  max-width: 0;
+  opacity: 0;
+}
+
+.slide-width-enter-to,
+.slide-width-leave-from {
+  max-width: 25%;
+}
+</style>

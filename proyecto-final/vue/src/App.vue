@@ -11,11 +11,10 @@
     <footer class="bg-gray-800 text-white py-2">
       <div class="container mx-auto px-4 text-center">
         <p class="text-sm">Made by Randae Garcia</p>
+        <Toast position="bottom-center" />
       </div>
     </footer>
   </div>
 </template>
 
-<script lang="ts" setup>
-// No se necesitan importaciones adicionales para este ejemplo
-</script>
+<script lang="ts" setup></script>

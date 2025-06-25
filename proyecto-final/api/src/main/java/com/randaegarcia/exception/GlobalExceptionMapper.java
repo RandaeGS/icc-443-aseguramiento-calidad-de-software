@@ -1,5 +1,6 @@
 package com.randaegarcia.exception;
 
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
@@ -15,6 +16,13 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
             return Response
                     .status(businessException.getStatus())
                     .entity(new ErrorResponse(businessException.getMessage(), businessException.getStatus().getStatusCode()))
+                    .build();
+        }
+
+        if (exception instanceof NotFoundException){
+            return Response
+                    .status(Response.Status.NOT_FOUND)
+                    .entity("Objeto no encontrado")
                     .build();
         }
 
