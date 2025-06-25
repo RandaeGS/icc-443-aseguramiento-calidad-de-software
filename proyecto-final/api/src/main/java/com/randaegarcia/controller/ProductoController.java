@@ -39,6 +39,12 @@ public class ProductoController {
         return productoService.save(producto);
     }
 
+    @PUT
+    @Transactional
+    public Response update(@NotNull @Valid Producto producto) {
+        return productoService.update(producto);
+    }
+
     @Path("{id}")
     @DELETE
     @Transactional

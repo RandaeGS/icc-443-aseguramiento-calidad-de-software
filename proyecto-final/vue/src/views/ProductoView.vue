@@ -322,13 +322,15 @@ const deleteProducto = async () => {
   }
 }
 
-const selectProducto = (producto: Producto): void => {
-  console.log(producto)
+const selectProducto = async (producto: Producto) => {
   Object.assign(productoForm, producto)
+  await nextTick()
+  formRef.value?.reset()
+  console.log(formRef.value?.validate())
 }
 
 const submitForm = () => {
-  console.log(formRef.value?.submit())
+  formRef.value?.submit()
 }
 
 const newFormulario = async () => {
@@ -343,6 +345,7 @@ const newFormulario = async () => {
   productoForm.impuesto = undefined
 
   await nextTick()
+  formRef.value?.reset()
 }
 
 const calcularBeneficio = () => {
@@ -392,13 +395,13 @@ const paginar = async (paginator: object) => {
 const resolver = ref(
   zodResolver(
     z.object({
-      id: z.string().optional(),
+      id: z.any().optional(),
       nombre: z.string().min(3, { message: 'Campo requerido' }),
       precio: z.number().gt(0, { message: 'Precio requerido' }),
       costo: z.number().gt(0, { message: 'Costo requerido' }),
       cantidadInicial: z.number().gte(0, { message: 'Cantidad inicial' }),
       categoria: z.string().min(1, { message: 'Categoria requerido' }),
-      impuesto: z.number().optional(),
+      impuesto: z.any().optional(),
       beneficio: z.number().optional(),
       descripcion: z.string().min(3, { message: 'Descripcion requerido' }),
     }),

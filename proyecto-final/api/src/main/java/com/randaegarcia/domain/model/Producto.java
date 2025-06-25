@@ -1,6 +1,7 @@
 package com.randaegarcia.domain.model;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.panache.common.Sort;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotNull;
@@ -56,12 +57,20 @@ public class Producto extends PanacheEntity {
     public Boolean isBorrado;
 
     public static List<Producto> findAllPaginated(int page, int size) {
-        return find("isBorrado", false)
+        return find("isBorrado = false order by id desc")
                 .page(page, size)
                 .list();
     }
 
     public static Producto findByNombre(String nombre){
         return find("nombre = ?1", nombre).firstResult();
+    }
+
+    public static boolean existsByNombre(String nombre){
+        return find("nombre = ?1", nombre) != null;
+    }
+
+    public static boolean existsById(Long id){
+        return findById(id) != null;
     }
 }
