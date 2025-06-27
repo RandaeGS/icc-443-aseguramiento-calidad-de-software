@@ -1,6 +1,6 @@
 <template>
   <div>
-    <header class="bg-slate-700 p-1 grow-0">
+    <header class="bg-slate-700 p-1 max-h-1/18">
       <nav class="flex justify-between">
         <div class="flex content-center gap-1">
           <Button
@@ -15,12 +15,12 @@
         <div class="content-center">
           <ButtonGroup>
             <Button
+              v-if="buttonState.eliminar"
               icon="pi pi-trash"
               label="Eliminar"
               severity="danger"
               size="small"
               @click="deleteProducto"
-              v-if="buttonState.eliminar"
             ></Button>
             <Button
               icon="pi pi-refresh"
@@ -41,9 +41,9 @@
       </nav>
     </header>
 
-    <main class="flex grow">
+    <main class="flex h-[calc(100%-5.5556%)]">
       <Transition name="slide-width">
-        <div class="flex flex-col grow mt-2 max-w-3/12" v-if="showList">
+        <div v-if="showList" class="flex flex-col grow mt-2 max-w-3/12">
           <div class="flex">
             <InputGroup>
               <InputText placeholder="Buscar" />
@@ -51,7 +51,7 @@
             </InputGroup>
           </div>
 
-          <div class="flex flex-col grow">
+          <div class="flex flex-col grow overflow-scroll">
             <div v-if="productoList.length === 0" class="text-center text-gray-500">
               No hay productos disponibles
             </div>

@@ -6,7 +6,7 @@
       </nav>
     </header>
 
-    <router-view class="overflow-scroll grow"></router-view>
+    <router-view class="overflow-scroll grow min-h-0"></router-view>
 
     <footer class="bg-gray-800 text-white py-2">
       <div class="container mx-auto px-4 text-center">
