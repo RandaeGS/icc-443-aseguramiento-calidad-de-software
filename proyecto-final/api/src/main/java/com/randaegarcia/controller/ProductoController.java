@@ -2,6 +2,8 @@ package com.randaegarcia.controller;
 
 import com.randaegarcia.domain.model.Producto;
 import com.randaegarcia.service.ProductoService;
+import io.quarkus.security.Authenticated;
+import io.quarkus.security.PermissionsAllowed;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
