@@ -2,9 +2,10 @@
 import { ProductService } from '@/service/ProductService';
 import { FilterMatchMode } from '@primevue/core/api';
 import { useToast } from 'primevue/usetoast';
-import { onMounted, ref } from 'vue';
+import { nextTick, onMounted, reactive, ref, watch } from 'vue';
 import axiosInstance from '@/plugins/axios';
-import
+import { zodResolver } from '@primevue/forms/resolvers/zod';
+import z from 'zod';
 
 onMounted(() => {
     ProductService.getProducts().then((data) => (products.value = data));
@@ -23,18 +24,15 @@ const filters = ref({
 const submitted = ref(false);
 
 function formatCurrency(value) {
-    console.log(value);
     if (value) return value.toLocaleString('en-US', { style: 'currency', currency: 'DOP' });
-    return;
 }
 
 function openNew() {
-    product.value = {};
-    submitted.value = false;
     productDialog.value = true;
 }
 
 function hideDialog() {
+    Object.assign(product, cleanProduct);
     productDialog.value = false;
     submitted.value = false;
 }
@@ -59,39 +57,52 @@ const resolver = ref(
     zodResolver(
         z.object({
             id: z.any().optional(),
-            nombre: z.string().min(3, { message: 'Campo requerido' }),
-            precio: z.number().gt(0, { message: 'Precio requerido' }),
-            costo: z.number().gt(0, { message: 'Costo requerido' }),
-            cantidadInicial: z.number().gte(0, { message: 'Cantidad inicial' }),
-            categoria: z.string().min(1, { message: 'Categoria requerido' }),
-            impuesto: z.any().optional(),
-            beneficio: z.number().optional(),
-            descripcion: z.string().min(3, { message: 'Descripcion requerido' })
+            name: z.string().min(3, { message: 'Required' }),
+            description: z.string().min(3, { message: 'Required' }),
+            category: z.string().min(1, { message: 'Required' }),
+            price: z.number().gt(0, { message: 'Required' }),
+            cost: z.number().gt(0, { message: 'Required' }),
+            quantity: z.number().gte(0, { message: 'Required' }),
+            profit: z.number().optional()
         })
     )
 );
 
 //Delete
 const deleteProduct = async () => {
-    if (product.value?.id === undefined) return;
+    if (product?.id === undefined) return;
     try {
-        await axiosInstance.delete(`/productos/${product.value.id}`);
-        deleteProductDialog.value = false;
+        await axiosInstance.delete(`/productos/${product.id}`);
         await clearProduct();
         await loadList();
+        deleteProductDialog.value = false;
     } catch (error) {
         console.error(error);
     }
 };
 
 // Form
-const product = ref({});
+const formRef = ref();
+const product = reactive({
+    id: undefined,
+    name: '',
+    description: '',
+    category: '',
+    price: 0,
+    cost: 0,
+    profit: 0,
+    quantity: 0
+});
+
+const submitForm = async () => {
+    formRef.value.validate();
+};
 
 const updateProduct = async () => {
     try {
-        await axiosInstance.put('/productos', product.value);
-        productDialog.value = false;
+        await axiosInstance.put('/productos', product);
         await clearProduct();
+        productDialog.value = false;
         await loadList();
     } catch (error) {
         console.error(error);
@@ -100,33 +111,49 @@ const updateProduct = async () => {
 
 const saveProduct = async () => {
     try {
-        await axiosInstance.post('/productos', product.value);
-        productDialog.value = false;
+        await axiosInstance.post('/productos', product);
         await clearProduct();
+        productDialog.value = false;
         await loadList();
     } catch (error) {
         console.log(error);
     }
 };
 
-function editProduct(prod) {
-    product.value = { ...prod };
+const editProduct = async (prod) => {
     productDialog.value = true;
-}
+    Object.assign(product, prod);
+    await nextTick();
+    console.log(formRef.value);
+    formRef.value.validate();
+};
 
 function confirmDeleteProduct(prod) {
-    product.value = prod;
+    Object.assign(product, prod);
     deleteProductDialog.value = true;
 }
 
 const clearProduct = async () => {
-    product.value = {};
+    Object.assign(product, cleanProduct);
+    await nextTick();
+    await formRef.value.reset();
+};
+
+let cleanProduct = {
+    id: undefined,
+    name: '',
+    description: '',
+    category: '',
+    price: null,
+    cost: null,
+    profit: null,
+    quantity: null
 };
 
 // List
 const productPage = ref([]);
 const page = ref(0);
-const size = ref(10);
+const size = ref(5);
 
 const loadList = async () => {
     try {
@@ -157,6 +184,15 @@ const paginate = async (paginator) => {
 onMounted(() => {
     loadList();
 });
+
+watch(
+    () => [product.price, product.cost],
+    () => {
+        let result = product?.price - product?.cost;
+        product.profit = Math.max(0, result) || 0;
+    },
+    { immediate: true }
+);
 </script>
 
 <template>
@@ -175,19 +211,20 @@ onMounted(() => {
 
             <DataTable
                 ref="dt"
+                dataKey="id"
                 v-model:selection="selectedProducts"
                 :value="productPage.content"
-                dataKey="id"
-                :paginator="true"
                 :rows="size"
                 :filters="filters"
+                :totalRecords="productPage.totalElements"
+                @page="paginate"
+                lazy
+                paginator
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                :rowsPerPageOptions="[5, 10, 25]"
+                :rowsPerPageOptions="[5, 10]"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
                 show-gridlines
                 striped-rows
-                @page="paginate"
-                :totalRecords="productPage.totalPages"
             >
                 <template #header>
                     <div class="flex flex-wrap gap-2 items-center justify-between">
@@ -225,15 +262,16 @@ onMounted(() => {
         </div>
 
         <Dialog v-model:visible="productDialog" :style="{ width: '450px' }" header="Product Details" :modal="true">
-            <div class="flex flex-col gap-6">
+            <Form ref="formRef" v-slot="$form" :resolver="resolver" :validateOnBlur="true" @submit="product.value?.id === undefined ? saveProduct() : updateProduct()" class="flex flex-col gap-6">
                 <div>
                     <label for="name" class="block font-bold mb-3">Name</label>
-                    <InputText id="name" v-model.trim="product.name" required="true" autofocus :invalid="submitted && !product.name" fluid />
-                    <small v-if="submitted && !product.name" class="text-red-500">Name is required.</small>
+                    <InputText id="name" name="name" v-model.trim="product.name" required="true" autofocus fluid />
+                    <small v-if="$form.name?.invalid" class="text-red-500">{{ $form.name.error?.message }}.</small>
                 </div>
                 <div>
                     <label for="description" class="block font-bold mb-3">Description</label>
-                    <Textarea id="description" v-model="product.description" required="true" rows="3" cols="20" fluid />
+                    <Textarea id="description" name="description" v-model="product.description" required="true" rows="3" cols="20" fluid />
+                    <small v-if="$form.description?.invalid" class="text-red-500">{{ $form.description.error?.message }}.</small>
                 </div>
 
                 <div>
@@ -261,11 +299,13 @@ onMounted(() => {
                 <div class="grid grid-cols-12 gap-4">
                     <div class="col-span-6">
                         <label for="price" class="block font-bold mb-3">Price</label>
-                        <InputNumber id="price" v-model="product.price" mode="currency" currency="USD" locale="en-US" fluid />
+                        <InputNumber id="price" name="price" v-model="product.price" mode="currency" currency="USD" locale="en-US" fluid />
+                        <small v-if="$form.price?.invalid" class="text-red-500">{{ $form.price.error?.message }}.</small>
                     </div>
                     <div class="col-span-6">
                         <label for="cost" class="block font-bold mb-3">Cost</label>
-                        <InputNumber id="cost" v-model="product.cost" mode="currency" currency="USD" locale="en-US" fluid />
+                        <InputNumber id="cost" name="cost" v-model="product.cost" mode="currency" currency="USD" locale="en-US" fluid />
+                        <small v-if="$form.cost?.invalid" class="text-red-500">{{ $form.cost.error?.message }}.</small>
                     </div>
                 </div>
 
@@ -276,14 +316,15 @@ onMounted(() => {
                     </div>
                     <div class="col-span-6">
                         <label for="quantity" class="block font-bold mb-3">Quantity</label>
-                        <InputNumber id="quantity" v-model="product.quantity" integeronly fluid />
+                        <InputNumber id="quantity" name="quantity" v-model="product.quantity" integeronly fluid />
+                        <small v-if="$form.quantity?.invalid" class="text-red-500">{{ $form.quantity.error?.message }}.</small>
                     </div>
                 </div>
-            </div>
+            </Form>
 
             <template #footer>
                 <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
-                <Button label="Save" icon="pi pi-check" @click="product.value?.id !== undefined ? saveProduct() : updateProduct()" />
+                <Button label="Save" icon="pi pi-check" type="submit" @click="submitForm" />
             </template>
         </Dialog>
 
