@@ -1,6 +1,6 @@
-CREATE SEQUENCE IF NOT EXISTS Producto_seq START WITH 1 INCREMENT BY 50;
+CREATE SEQUENCE IF NOT EXISTS producto_seq START WITH 1 INCREMENT BY 50;
 
-CREATE TABLE Producto
+CREATE TABLE producto
 (
     id              BIGINT           NOT NULL,
     nombre          VARCHAR(100)     NOT NULL,
@@ -12,5 +12,5 @@ CREATE TABLE Producto
     CONSTRAINT pk_producto PRIMARY KEY (id)
 );
 
-ALTER TABLE Producto
+ALTER TABLE producto
     ADD CONSTRAINT uc_producto_nombre UNIQUE (nombre);

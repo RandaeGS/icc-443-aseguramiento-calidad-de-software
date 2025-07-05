@@ -1,6 +1,5 @@
 package com.randaegarcia.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.randaegarcia.domain.dto.PaginatedResponse;
 import com.randaegarcia.domain.model.Producto;
 import com.randaegarcia.exception.ConflictException;
@@ -19,16 +18,17 @@ public class ProductoService {
 
     public Response findAll(int page, int size) {
         List<Producto> productoList = Producto.findAllPaginated(page, size);
-        long total = Producto.find("isBorrado", false).count();
+        long total = Producto.find("isActive", false).count();
+
         PaginatedResponse<Producto> response = PaginatedResponse.of(productoList, page, size, total);
         return Response.ok(response).build();
     }
 
     public Response save(@NotNull @Valid Producto producto) {
-        if (Producto.existsByNombre(producto.nombre)) {
+        if (Producto.existsByNombre(producto.name)) {
             throw new ConflictException("Nombre de producto ya existe");
         }
-        producto.isBorrado = false;
+        producto.isActive = false;
         producto.persist();
         return Response.ok(producto).build();
     }
@@ -42,14 +42,13 @@ public class ProductoService {
         if (oldProducto == null) {
             throw new NotFoundException("Producto no encontrado");
         }
-        oldProducto.nombre = producto.nombre;
-        oldProducto.descripcion = producto.descripcion;
-        oldProducto.categoria = producto.categoria;
-        oldProducto.impuesto = producto.impuesto;
-        oldProducto.precio = producto.precio;
-        oldProducto.costo = producto.costo;
-        oldProducto.beneficio = producto.beneficio;
-        oldProducto.cantidadInicial = producto.cantidadInicial;
+        oldProducto.name = producto.name;
+        oldProducto.description = producto.description;
+        oldProducto.category = producto.category;
+        oldProducto.price = producto.price;
+        oldProducto.cost = producto.cost;
+        oldProducto.profit = producto.profit;
+        oldProducto.quantity = producto.quantity;
 
         return Response.ok(producto).build();
     }
@@ -59,7 +58,7 @@ public class ProductoService {
         if (producto == null) {
             throw new NotFoundException("Producto no encontrado");
         }
-        producto.isBorrado = true;
+        producto.isActive = true;
         producto.persist();
         return Response.ok(producto).build();
     }

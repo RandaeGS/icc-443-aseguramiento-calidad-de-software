@@ -1,7 +1,6 @@
 package com.randaegarcia.domain.model;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
-import io.quarkus.panache.common.Sort;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotNull;
@@ -20,54 +19,50 @@ public class Producto extends PanacheEntity {
     @NotNull
     @Size(min = 3, max = 100)
     @Column(nullable = false, unique = true)
-    public String nombre;
+    public String name;
 
     @NotNull
     @Size(min = 3, max = 100)
     @Column(nullable = false)
-    public String descripcion;
+    public String description;
 
     @NotNull
     @Column(nullable = false)
-    public String categoria;
+    public String category;
 
     @PositiveOrZero
     @Column(nullable = false)
-    public Double precio;
+    public Double price;
 
     @PositiveOrZero
     @Column(nullable = false)
-    public Double costo;
+    public Double cost;
 
     @NotNull
     @Column(nullable = false)
-    public Double beneficio;
+    public Double profit;
 
     @PositiveOrZero
     @Column(nullable = false)
-    public Long cantidadInicial;
-
-    @PositiveOrZero
-    @Column
-    public Integer impuesto;
+    public Long quantity;
 
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
-    @Column(name = "is_borrado")
-    public Boolean isBorrado;
+    @Column(name = "is_active")
+    public Boolean isActive;
 
     public static List<Producto> findAllPaginated(int page, int size) {
-        return find("isBorrado = false order by id desc")
+        return find("isActive = false order by id desc")
                 .page(page, size)
                 .list();
     }
 
-    public static Producto findByNombre(String nombre){
-        return find("nombre = ?1", nombre).firstResult();
+    public static Producto findByNombre(String name){
+        return find("name = ?1", name).firstResult();
     }
 
-    public static boolean existsByNombre(String nombre){
-        return find("nombre = ?1", nombre) != null;
+    public static boolean existsByNombre(String name){
+        return count("name = ?1 and isActive = false", name) > 0;
     }
 
     public static boolean existsById(Long id){
