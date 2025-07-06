@@ -1,6 +1,9 @@
 <script setup>
 import { useLayout } from '@/layout/composables/layout';
 import AppConfigurator from './AppConfigurator.vue';
+import { useKeycloak } from '@dsb-norge/vue-keycloak-js';
+
+const keycloak = useKeycloak();
 
 const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
 </script>
@@ -72,6 +75,7 @@ const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
                         <i class="pi pi-user"></i>
                         <span>Profile</span>
                     </button>
+                    <h1>{{ keycloak.userName }}</h1>
                 </div>
             </div>
         </div>

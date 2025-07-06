@@ -8,6 +8,7 @@
         "lint": "eslint --fix . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
     },
     "dependencies": {
+        "@dsb-norge/vue-keycloak-js": "^3.0.3",
         "@primeuix/themes": "^1.0.0",
         "@primevue/forms": "^4.3.6",
         "axios": "^1.10.0",
