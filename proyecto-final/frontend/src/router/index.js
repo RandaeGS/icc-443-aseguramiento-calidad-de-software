@@ -6,13 +6,13 @@ const router = createRouter({
     routes: [
         {
             path: '/',
+            name: 'landing',
+            component: () => import('@/views/pages/Landing.vue')
+        },
+        {
+            path: '/',
             component: AppLayout,
             children: [
-                {
-                    path: '/',
-                    name: 'landing',
-                    component: () => import('@/views/pages/Landing.vue')
-                },
                 {
                     path: '/products',
                     name: 'products',
