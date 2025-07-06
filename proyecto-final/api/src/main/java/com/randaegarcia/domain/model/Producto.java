@@ -52,7 +52,7 @@ public class Producto extends PanacheEntity {
     public Boolean isActive;
 
     public static List<Producto> findAllPaginated(int page, int size) {
-        return find("isActive = false order by id desc")
+        return find("isActive = true order by id desc")
                 .page(page, size)
                 .list();
     }
@@ -62,7 +62,7 @@ public class Producto extends PanacheEntity {
     }
 
     public static boolean existsByNombre(String name){
-        return count("name = ?1 and isActive = false", name) > 0;
+        return count("name = ?1 and isActive = true", name) > 0;
     }
 
     public static boolean existsById(Long id){

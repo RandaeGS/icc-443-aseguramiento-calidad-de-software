@@ -18,7 +18,7 @@ public class ProductoService {
 
     public Response findAll(int page, int size) {
         List<Producto> productoList = Producto.findAllPaginated(page, size);
-        long total = Producto.find("isActive", false).count();
+        long total = Producto.find("isActive", true).count();
 
         PaginatedResponse<Producto> response = PaginatedResponse.of(productoList, page, size, total);
         return Response.ok(response).build();
@@ -28,7 +28,7 @@ public class ProductoService {
         if (Producto.existsByNombre(producto.name)) {
             throw new ConflictException("Nombre de producto ya existe");
         }
-        producto.isActive = false;
+        producto.isActive = true;
         producto.persist();
         return Response.ok(producto).build();
     }
@@ -58,7 +58,7 @@ public class ProductoService {
         if (producto == null) {
             throw new NotFoundException("Producto no encontrado");
         }
-        producto.isActive = true;
+        producto.isActive = false;
         producto.persist();
         return Response.ok(producto).build();
     }

@@ -4,8 +4,8 @@ import { FilterMatchMode } from '@primevue/core/api';
 import { useToast } from 'primevue/usetoast';
 import { nextTick, onMounted, reactive, ref, watch } from 'vue';
 import axiosInstance from '@/plugins/axios';
-import { zodResolver } from '@primevue/forms/resolvers/zod';
-import z from 'zod';
+import { z } from 'zod';
+import { Form } from '@primevue/forms';
 
 onMounted(() => {
     ProductService.getProducts().then((data) => (products.value = data));
@@ -21,7 +21,6 @@ const selectedProducts = ref();
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
 });
-const submitted = ref(false);
 
 function formatCurrency(value) {
     if (value) return value.toLocaleString('en-US', { style: 'currency', currency: 'DOP' });
@@ -29,12 +28,6 @@ function formatCurrency(value) {
 
 function openNew() {
     productDialog.value = true;
-}
-
-function hideDialog() {
-    Object.assign(product, cleanProduct);
-    productDialog.value = false;
-    submitted.value = false;
 }
 
 function exportCSV() {
@@ -52,32 +45,66 @@ function deleteSelectedProducts() {
     toast.add({ severity: 'success', summary: 'Successful', detail: 'Products Deleted', life: 3000 });
 }
 
+// Dialog controls
+const hideDialog = () => {
+    Object.assign(product, cleanProduct);
+    errors.value = {};
+    productDialog.value = false;
+};
+
 //Validation
-const resolver = ref(
-    zodResolver(
-        z.object({
-            id: z.any().optional(),
-            name: z.string().min(3, { message: 'Required' }),
-            description: z.string().min(3, { message: 'Required' }),
-            category: z.string().min(1, { message: 'Required' }),
-            price: z.number().gt(0, { message: 'Required' }),
-            cost: z.number().gt(0, { message: 'Required' }),
-            quantity: z.number().gte(0, { message: 'Required' }),
-            profit: z.number().optional()
-        })
-    )
-);
+const errors = ref({});
+const productSchema = z.object({
+    id: z.any().optional(),
+    name: z.string().min(3, { message: 'Name is required (min 3 chars)' }),
+    description: z.string().min(3, { message: 'Description is required (min 3 chars)' }),
+    category: z.string().min(1, { message: 'Category is required' }),
+    price: z.number().gt(0, { message: 'Price must be greater than 0' }),
+    cost: z.number().gt(0, { message: 'Cost must be greater than 0' }),
+    quantity: z.number().gte(0, { message: 'Quantity must be 0 or greater' }),
+    profit: z.number().optional()
+});
+
+const validateProduct = () => {
+    try {
+        productSchema.parse(product);
+        errors.value = {};
+        return true;
+    } catch (error) {
+        errors.value = {};
+        error.errors.forEach((err) => {
+            errors.value[err.path[0]] = err.message;
+        });
+        return false;
+    }
+};
 
 //Delete
+const confirmDeleteProduct = (prod) => {
+    Object.assign(product, prod);
+    deleteProductDialog.value = true;
+};
+
 const deleteProduct = async () => {
     if (product?.id === undefined) return;
     try {
         await axiosInstance.delete(`/productos/${product.id}`);
-        await clearProduct();
-        await loadList();
         deleteProductDialog.value = false;
+        toast.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Product deleted',
+            life: 3000
+        });
+        await loadList();
     } catch (error) {
         console.error(error);
+        toast.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Error deleting product',
+            life: 3000
+        });
     }
 };
 
@@ -95,28 +122,56 @@ const product = reactive({
 });
 
 const submitForm = async () => {
-    formRef.value.validate();
+    if (validateProduct()) {
+        if (product.id === undefined) {
+            await saveProduct();
+        } else {
+            await updateProduct();
+        }
+    }
 };
 
 const updateProduct = async () => {
     try {
         await axiosInstance.put('/productos', product);
-        await clearProduct();
-        productDialog.value = false;
+        hideDialog();
+        toast.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Product updated',
+            life: 3000
+        });
         await loadList();
     } catch (error) {
         console.error(error);
+        toast.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Error updating product',
+            life: 3000
+        });
     }
 };
 
 const saveProduct = async () => {
     try {
         await axiosInstance.post('/productos', product);
-        await clearProduct();
-        productDialog.value = false;
+        hideDialog();
+        toast.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Product saved',
+            life: 3000
+        });
         await loadList();
     } catch (error) {
         console.log(error);
+        toast.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Error saving product',
+            life: 3000
+        });
     }
 };
 
@@ -124,19 +179,6 @@ const editProduct = async (prod) => {
     productDialog.value = true;
     Object.assign(product, prod);
     await nextTick();
-    console.log(formRef.value);
-    formRef.value.validate();
-};
-
-function confirmDeleteProduct(prod) {
-    Object.assign(product, prod);
-    deleteProductDialog.value = true;
-}
-
-const clearProduct = async () => {
-    Object.assign(product, cleanProduct);
-    await nextTick();
-    await formRef.value.reset();
 };
 
 let cleanProduct = {
@@ -169,7 +211,7 @@ const loadList = async () => {
         toast.add({
             severity: 'error',
             summary: 'Error',
-            detail: 'No se pudieron cargar los productos',
+            detail: 'Error loading products',
             life: 3000
         });
     }
@@ -262,16 +304,17 @@ watch(
         </div>
 
         <Dialog v-model:visible="productDialog" :style="{ width: '450px' }" header="Product Details" :modal="true">
-            <Form ref="formRef" v-slot="$form" :resolver="resolver" :validateOnBlur="true" @submit="product.value?.id === undefined ? saveProduct() : updateProduct()" class="flex flex-col gap-6">
+            <Form ref="formRef" :validateOnBlur="true" @submit="product.value?.id === undefined ? saveProduct() : updateProduct()" class="flex flex-col gap-6">
                 <div>
                     <label for="name" class="block font-bold mb-3">Name</label>
                     <InputText id="name" name="name" v-model.trim="product.name" required="true" autofocus fluid />
-                    <small v-if="$form.name?.invalid" class="text-red-500">{{ $form.name.error?.message }}.</small>
+                    <small v-if="errors.name" class="text-red-500">{{ errors.name }}.</small>
                 </div>
+
                 <div>
                     <label for="description" class="block font-bold mb-3">Description</label>
                     <Textarea id="description" name="description" v-model="product.description" required="true" rows="3" cols="20" fluid />
-                    <small v-if="$form.description?.invalid" class="text-red-500">{{ $form.description.error?.message }}.</small>
+                    <small v-if="errors.description" class="text-red-500">{{ errors.description }}.</small>
                 </div>
 
                 <div>
@@ -294,18 +337,19 @@ watch(
                             <label for="category4">Fitness</label>
                         </div>
                     </div>
+                    <small v-if="errors.category" class="text-red-500">{{ errors.category }}.</small>
                 </div>
 
                 <div class="grid grid-cols-12 gap-4">
                     <div class="col-span-6">
                         <label for="price" class="block font-bold mb-3">Price</label>
                         <InputNumber id="price" name="price" v-model="product.price" mode="currency" currency="USD" locale="en-US" fluid />
-                        <small v-if="$form.price?.invalid" class="text-red-500">{{ $form.price.error?.message }}.</small>
+                        <small v-if="errors.price" class="text-red-500">{{ errors.price }}.</small>
                     </div>
                     <div class="col-span-6">
                         <label for="cost" class="block font-bold mb-3">Cost</label>
                         <InputNumber id="cost" name="cost" v-model="product.cost" mode="currency" currency="USD" locale="en-US" fluid />
-                        <small v-if="$form.cost?.invalid" class="text-red-500">{{ $form.cost.error?.message }}.</small>
+                        <small v-if="errors.cost" class="text-red-500">{{ errors.cost }}.</small>
                     </div>
                 </div>
 
@@ -317,7 +361,7 @@ watch(
                     <div class="col-span-6">
                         <label for="quantity" class="block font-bold mb-3">Quantity</label>
                         <InputNumber id="quantity" name="quantity" v-model="product.quantity" integeronly fluid />
-                        <small v-if="$form.quantity?.invalid" class="text-red-500">{{ $form.quantity.error?.message }}.</small>
+                        <small v-if="errors.quantity" class="text-red-500">{{ errors.quantity }}.</small>
                     </div>
                 </div>
             </Form>
