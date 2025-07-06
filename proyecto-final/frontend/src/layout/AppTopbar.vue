@@ -6,6 +6,10 @@ import { useKeycloak } from '@dsb-norge/vue-keycloak-js';
 const keycloak = useKeycloak();
 
 const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
+
+const logout = () => {
+    keycloak.logoutFn();
+};
 </script>
 
 <template>
@@ -64,10 +68,6 @@ const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
             <div class="layout-topbar-menu hidden lg:block">
                 <div class="layout-topbar-menu-content">
                     <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-calendar"></i>
-                        <span>Calendar</span>
-                    </button>
-                    <button type="button" class="layout-topbar-action">
                         <i class="pi pi-inbox"></i>
                         <span>Messages</span>
                     </button>
@@ -75,7 +75,13 @@ const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
                         <i class="pi pi-user"></i>
                         <span>Profile</span>
                     </button>
-                    <h1>{{ keycloak.userName }}</h1>
+                    <div class="flex border-t lg:border-t-0 border-surface py-4 lg:py-0 mt-4 lg:mt-0 gap-2">
+                        <Button v-if="!keycloak.authenticated" label="Login" to="/auth/login" as="router-link" rounded></Button>
+                        <div v-else class="flex border-t lg:border-t-0 border-surface py-4 lg:py-0 mt-4 lg:mt-0 gap-2 content-center">
+                            <p class="my-auto">{{ keycloak.fullName }}</p>
+                            <Button v-if="keycloak.authenticated" label="Logout" @click="logout" rounded></Button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

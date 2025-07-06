@@ -13,7 +13,6 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
     (config) => {
         const keycloak = useKeycloak();
-        console.log(keycloak.hasRealmRole('employee'));
         if (keycloak.authenticated) {
             config.headers.Authorization = `Bearer ${keycloak.token}`;
         }
