@@ -46,9 +46,7 @@ public class Producto extends PanacheEntity {
     @Column(nullable = false)
     public Long quantity;
 
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
-    @Column(name = "is_active")
+    @Column(name = "is_active", nullable = false)
     public Boolean isActive;
 
     public static List<Producto> findAllPaginated(int page, int size) {

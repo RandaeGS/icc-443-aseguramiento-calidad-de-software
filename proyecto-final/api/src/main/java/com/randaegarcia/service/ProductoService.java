@@ -50,12 +50,12 @@ public class ProductoService {
         oldProducto.profit = producto.profit;
         oldProducto.quantity = producto.quantity;
 
-        return Response.ok(producto).build();
+        return Response.ok(oldProducto).build();
     }
 
     public Response deleteProducto(Long id) {
         Producto producto = Producto.findById(id);
-        if (producto == null) {
+        if (producto == null || !producto.isActive) {
             throw new NotFoundException("Producto no encontrado");
         }
         producto.isActive = false;
