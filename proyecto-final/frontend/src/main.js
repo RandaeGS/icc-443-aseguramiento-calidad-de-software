@@ -11,7 +11,15 @@ import '@/assets/styles.scss';
 import VueKeyCloak from '@dsb-norge/vue-keycloak-js';
 
 const app = createApp(App);
+
+app.use(router);
+
 app.use(VueKeyCloak, {
+    init: {
+        onLoad: 'check-sso',
+        checkLoginIfFrame: false,
+        flow: 'standard'
+    },
     config: {
         url: 'http://localhost:7080',
         realm: 'project',
@@ -21,8 +29,6 @@ app.use(VueKeyCloak, {
         console.log('App is ready!');
     }
 });
-
-app.use(router);
 app.use(PrimeVue, {
     theme: {
         preset: Aura,

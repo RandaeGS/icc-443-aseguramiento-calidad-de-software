@@ -8,7 +8,10 @@ const keycloak = useKeycloak();
 const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
 
 const logout = () => {
-    keycloak.logoutFn();
+    const logoutUrl = keycloak.createLogoutUrl({
+        redirectUri: window.location.origin + '/'
+    });
+    window.location.href = logoutUrl;
 };
 </script>
 

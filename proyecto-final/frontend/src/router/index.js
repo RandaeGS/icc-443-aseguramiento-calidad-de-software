@@ -1,5 +1,10 @@
 import AppLayout from '@/layout/AppLayout.vue';
 import { createRouter, createWebHistory } from 'vue-router';
+import { useKeycloak } from '@dsb-norge/vue-keycloak-js';
+
+// Variable global para trackear el estado de Keycloak
+let keycloakReady = false;
+let keycloakReadyPromise = null;
 
 const router = createRouter({
     history: createWebHistory(),
@@ -7,16 +12,18 @@ const router = createRouter({
         {
             path: '/',
             name: 'landing',
-            component: () => import('@/views/pages/Landing.vue')
+            component: () => import('@/views/pages/Landing.vue'),
+            meta: { requiresAuth: false }
         },
         {
-            path: '/',
+            path: '/products',
             component: AppLayout,
             children: [
                 {
-                    path: '/products',
+                    path: '',
                     name: 'products',
-                    component: () => import('@/views/pages/Products.vue')
+                    component: () => import('@/views/pages/Products.vue'),
+                    meta: { requiresAuth: true }
                 },
                 {
                     path: '/uikit/formlayout',
@@ -133,6 +140,60 @@ const router = createRouter({
             component: () => import('@/views/pages/auth/Error.vue')
         }
     ]
+});
+
+// Función para esperar a que Keycloak esté listo
+function waitForKeycloak() {
+    if (keycloakReady) {
+        return Promise.resolve();
+    }
+
+    if (!keycloakReadyPromise) {
+        keycloakReadyPromise = new Promise((resolve) => {
+            const checkReady = () => {
+                const keycloak = useKeycloak();
+                if (keycloak && keycloak.ready) {
+                    keycloakReady = true;
+                    resolve();
+                } else {
+                    setTimeout(checkReady, 100);
+                }
+            };
+            checkReady();
+        });
+    }
+
+    return keycloakReadyPromise;
+}
+
+// Navigation Guard
+router.beforeEach(async (to, from, next) => {
+    try {
+        console.log('Navigation to:', to.path);
+
+        // Esperar a que Keycloak esté listo
+        await waitForKeycloak();
+
+        const keycloak = useKeycloak();
+        const requiresAuth = to.matched.some((record) => record.meta.requiresAuth === true);
+
+        console.log('Keycloak ready, checking auth:', {
+            requiresAuth,
+            authenticated: keycloak.authenticated
+        });
+
+        if (requiresAuth && !keycloak.authenticated) {
+            console.log('Redirecting to Keycloak login');
+            await keycloak.login({
+                redirectUri: window.location.origin + to.fullPath
+            });
+        } else {
+            return next();
+        }
+    } catch (error) {
+        console.error('Navigation guard error:', error);
+        return next();
+    }
 });
 
 export default router;

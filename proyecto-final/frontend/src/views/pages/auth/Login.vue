@@ -1,10 +1,17 @@
 <script setup>
 import FloatingConfigurator from '@/components/FloatingConfigurator.vue';
-import { ref } from 'vue';
+import { nextTick, onMounted, ref } from 'vue';
+import { useKeycloak } from '@dsb-norge/vue-keycloak-js';
 
 const email = ref('');
 const password = ref('');
 const checked = ref(false);
+
+const keycloak = useKeycloak();
+onMounted(async () => {
+    await nextTick();
+    await keycloak.login();
+});
 </script>
 
 <template>
