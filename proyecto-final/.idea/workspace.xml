@@ -1,54 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="3b5699db-3dea-4731-ae22-b373e9b7fc6f" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/frontend/.browserslistrc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.editorconfig" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.eslintrc-auto-import.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/env.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/eslint.config.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/public/favicon.ico" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/App.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/assets/logo.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/assets/logo.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/auto-imports.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/AppFooter.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/HelloWorld.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/Navbar.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/layouts/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/layouts/default.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/models/Producto.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/index.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/productos.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/plugins/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/plugins/axios.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/plugins/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/plugins/vuetify.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/router/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/stores/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/stores/app.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/stores/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/styles/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/styles/settings.scss" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/typed-router.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/tsconfig.app.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/tsconfig.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/tsconfig.node.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vite.config.mts" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/api/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/.dockerignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/src/main/docker/Development.yml" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Dockerfile" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
@@ -61,18 +34,88 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/randaegs/github/icc-443-aseguramiento-calidad-de-software/proyecto-final&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.fonts.default&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Docker.Development.yml.api: Compose Deployment.executor": "Run",
+    "Docker.Development.yml.backend-api: Compose Deployment.executor": "Run",
+    "Docker.Development.yml: Compose Deployment.executor": "Run",
+    "Docker.api/Dockerfile.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/home/randaegs/github/icc-443-aseguramiento-calidad-de-software/proyecto-final",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "editor.preferences.fonts.default",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
+  <component name="RunManager" selected="Docker.Development.yml: Compose Deployment">
+    <configuration name="Development.yml: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="sourceFilePath" value="Development.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="Development.yml.api: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="services">
+            <list>
+              <option value="api" />
+            </list>
+          </option>
+          <option name="sourceFilePath" value="Development.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="Development.yml.backend-api: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="services">
+            <list>
+              <option value="backend-api" />
+            </list>
+          </option>
+          <option name="sourceFilePath" value="Development.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
+      <deployment type="docker-compose.yml" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="dockerfile" temporary="true">
+      <deployment type="dockerfile" />
+      <method v="2" />
+    </configuration>
+    <configuration name="api/Dockerfile" type="docker-deploy" factoryName="dockerfile" temporary="true" server-name="Docker">
+      <deployment type="dockerfile">
+        <settings>
+          <option name="buildOnly" value="true" />
+          <option name="sourceFilePath" value="api/Dockerfile" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Docker.Development.yml: Compose Deployment" />
+        <item itemvalue="Docker.Development.yml.api: Compose Deployment" />
+        <item itemvalue="Docker.api/Dockerfile" />
+        <item itemvalue="Docker.Development.yml.backend-api: Compose Deployment" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -91,6 +134,7 @@
       <workItem from="1746068158593" duration="112000" />
       <workItem from="1751683450702" duration="3000" />
       <workItem from="1751683481788" duration="2000" />
+      <workItem from="1751998484444" duration="3476000" />
     </task>
     <servers />
   </component>
