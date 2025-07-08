@@ -1,0 +1,3 @@
+ALTER TABLE producto
+    ALTER COLUMN is_active SET NOT NULL,
+    ALTER COLUMN is_active SET DEFAULT FALSE;

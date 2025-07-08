@@ -12,7 +12,7 @@ CREATE TABLE producto
     cost        DOUBLE PRECISION NOT NULL,
     profit      DOUBLE PRECISION NOT NULL,
     quantity    BIGINT           NOT NULL,
-    is_active   BOOLEAN          NOT NULL DEFAULT FALSE,
+    is_active   BOOLEAN,
     CONSTRAINT pk_producto PRIMARY KEY (id)
 );
 

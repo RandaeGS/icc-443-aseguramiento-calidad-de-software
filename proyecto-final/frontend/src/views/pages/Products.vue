@@ -6,11 +6,13 @@ import { nextTick, onMounted, reactive, ref, watch } from 'vue';
 import axiosInstance from '@/plugins/axios';
 import { z } from 'zod';
 import { Form } from '@primevue/forms';
+import { useKeycloak } from '@dsb-norge/vue-keycloak-js';
 
 onMounted(() => {
     ProductService.getProducts().then((data) => (products.value = data));
 });
 
+const keycloak = useKeycloak();
 const toast = useToast();
 const dt = ref();
 const products = ref();
@@ -235,6 +237,26 @@ watch(
     },
     { immediate: true }
 );
+
+const callIntegrationApi = async () => {
+    try {
+        const response = await axiosInstance.get('http://localhost:8081/integrations');
+        toast.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: response.data,
+            life: 3000
+        });
+    } catch (error) {
+        console.error(error);
+        toast.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Error during process',
+            life: 3000
+        });
+    }
+};
 </script>
 
 <template>
@@ -247,7 +269,10 @@ watch(
                 </template>
 
                 <template #end>
-                    <Button label="Export" icon="pi pi-upload" severity="secondary" @click="exportCSV($event)" />
+                    <div class="flex items-center gap-2">
+                        <Button label="Operate" icon="pi pi-receipt" severity="secondary" @click="callIntegrationApi" v-if="keycloak.hasRealmRole('admin')" />
+                        <Button label="Export" icon="pi pi-upload" severity="secondary" @click="exportCSV($event)" />
+                    </div>
                 </template>
             </Toolbar>
 
