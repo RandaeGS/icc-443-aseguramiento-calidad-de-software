@@ -1,0 +1,1 @@
+ALTER TABLE IF EXISTS revinfo ADD COLUMN username varchar(100)

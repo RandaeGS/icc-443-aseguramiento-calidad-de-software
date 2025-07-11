@@ -4,12 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3b5699db-3dea-4731-ae22-b373e9b7fc6f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/api/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/Dockerfile" afterDir="false" />
+    <list default="true" id="3b5699db-3dea-4731-ae22-b373e9b7fc6f" name="Changes" comment="fix: quarkus dockerfile">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/.dockerignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/src/main/docker/Development.yml" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,27 +30,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Docker.Development.yml.api: Compose Deployment.executor": "Run",
-    "Docker.Development.yml.backend-api: Compose Deployment.executor": "Run",
-    "Docker.Development.yml: Compose Deployment.executor": "Run",
-    "Docker.api/Dockerfile.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "/home/randaegs/github/icc-443-aseguramiento-calidad-de-software/proyecto-final",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "editor.preferences.fonts.default",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Docker.Development.yml.api: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.Development.yml.backend-api: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.Development.yml: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.api/Dockerfile.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SONARLINT_PRECOMMIT_ANALYSIS&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/randaegs/github/icc-443-aseguramiento-calidad-de-software/proyecto-final&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.fonts.default&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Docker.Development.yml: Compose Deployment">
     <configuration name="Development.yml: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
       <deployment type="docker-compose.yml">
@@ -91,11 +88,15 @@
       <method v="2" />
     </configuration>
     <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
-      <deployment type="docker-compose.yml" />
+      <deployment type="docker-compose.yml">
+        <settings />
+      </deployment>
       <method v="2" />
     </configuration>
     <configuration default="true" type="docker-deploy" factoryName="dockerfile" temporary="true">
-      <deployment type="dockerfile" />
+      <deployment type="dockerfile">
+        <settings />
+      </deployment>
       <method v="2" />
     </configuration>
     <configuration name="api/Dockerfile" type="docker-deploy" factoryName="dockerfile" temporary="true" server-name="Docker">
@@ -134,12 +135,35 @@
       <workItem from="1746068158593" duration="112000" />
       <workItem from="1751683450702" duration="3000" />
       <workItem from="1751683481788" duration="2000" />
-      <workItem from="1751998484444" duration="3476000" />
+      <workItem from="1751998484444" duration="8634000" />
+      <workItem from="1752235591589" duration="29000" />
     </task>
+    <task id="LOCAL-00001" summary="init dockerization">
+      <option name="closed" value="true" />
+      <created>1752002323278</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1752002323278</updated>
+    </task>
+    <task id="LOCAL-00002" summary="fix: quarkus dockerfile">
+      <option name="closed" value="true" />
+      <created>1752004941972</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1752004941972</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="init dockerization" />
+    <MESSAGE value="fix: quarkus dockerfile" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: quarkus dockerfile" />
   </component>
   <component name="com.vaadin.designer2.intellij.settings.SizePresetsSettingsComponent">
     <option name="sizePresets">

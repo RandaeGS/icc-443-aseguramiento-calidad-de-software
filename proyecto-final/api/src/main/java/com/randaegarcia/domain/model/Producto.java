@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.envers.Audited;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @Entity
+@Audited
 public class Producto extends PanacheEntity {
 
     @NotNull

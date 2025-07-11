@@ -45,40 +45,6 @@ services:
       timeout: 5s
       retries: 5
 
-  api:
-    build:
-      context: ./api
-      dockerfile: Dockerfile
-    container_name: backend-api
-    depends_on:
-      - keycloak
-    ports:
-      - "8080:8080"
-    networks:
-      - app-network
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/q/health/ready" ]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: frontend
-    ports:
-      - "5173:5173"
-    depends_on:
-      - api
-    networks:
-      - app-network
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:5173" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
 networks:
   app-network:
     driver: bridge
