@@ -1,6 +1,5 @@
 <script setup>
 import { ProductService } from '@/service/ProductService';
-import { FilterMatchMode } from '@primevue/core/api';
 import { useToast } from 'primevue/usetoast';
 import { nextTick, onMounted, reactive, ref, watch } from 'vue';
 import axiosInstance from '@/plugins/axios';
@@ -20,9 +19,6 @@ const productDialog = ref(false);
 const deleteProductDialog = ref(false);
 const deleteProductsDialog = ref(false);
 const selectedProducts = ref();
-const filters = ref({
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS }
-});
 
 function formatCurrency(value) {
     if (value) return value.toLocaleString('en-US', { style: 'currency', currency: 'DOP' });
@@ -198,13 +194,20 @@ let cleanProduct = {
 const productPage = ref([]);
 const page = ref(0);
 const size = ref(5);
+const filters = reactive({
+    name: undefined,
+    maxPrice: undefined,
+    minPrice: undefined,
+    category: undefined
+});
 
 const loadList = async () => {
     try {
         const response = await axiosInstance.get('/productos', {
             params: {
                 page: page.value,
-                size: size.value
+                size: size.value,
+                name: filters.name
             }
         });
         productPage.value = response.data;
@@ -282,7 +285,6 @@ const callIntegrationApi = async () => {
                 v-model:selection="selectedProducts"
                 :value="productPage.content"
                 :rows="size"
-                :filters="filters"
                 :totalRecords="productPage.totalElements"
                 @page="paginate"
                 lazy
@@ -300,7 +302,7 @@ const callIntegrationApi = async () => {
                             <InputIcon>
                                 <i class="pi pi-search" />
                             </InputIcon>
-                            <InputText v-model="filters['global'].value" placeholder="Search..." />
+                            <InputText v-model="filters.name" @keyup.enter="loadList" placeholder="Search..." />
                         </IconField>
                     </div>
                 </template>

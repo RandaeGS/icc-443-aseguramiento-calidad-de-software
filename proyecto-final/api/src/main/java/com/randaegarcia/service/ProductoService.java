@@ -3,24 +3,37 @@ package com.randaegarcia.service;
 import com.randaegarcia.domain.dto.PaginatedResponse;
 import com.randaegarcia.domain.model.Producto;
 import com.randaegarcia.exception.ConflictException;
+import com.speedment.jpastreamer.application.JPAStreamer;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.Response;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
 @Slf4j
 @ApplicationScoped
+@RequiredArgsConstructor
 public class ProductoService {
+    private final JPAStreamer jpaStreamer;
 
-    public Response findAll(int page, int size) {
-        List<Producto> productoList = Producto.findAllPaginated(page, size);
+    public Response findAll(int page, int size, String name) {
         long total = Producto.find("isActive", true).count();
 
+        List<Producto> productoList = jpaStreamer.stream(Producto.class)
+                .skip((long) page * size)
+                .limit(size)
+                .filter(Producto::getIsActive)
+                .filter(producto -> producto.getName().toLowerCase().startsWith(name.toLowerCase()))
+                .sorted((o1, o2) -> o2.id.compareTo(o1.id))
+                .toList();
+
         PaginatedResponse<Producto> response = PaginatedResponse.of(productoList, page, size, total);
+
+        jpaStreamer.close();
         return Response.ok(response).build();
     }
 

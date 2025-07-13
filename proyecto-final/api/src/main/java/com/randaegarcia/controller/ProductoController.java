@@ -24,8 +24,9 @@ public class ProductoController {
     private final ProductoService productoService;
 
     @GET
-    public Response findAll(@QueryParam("page") @DefaultValue("0") int page,  @QueryParam("size") @DefaultValue("10") int size) {
-        return productoService.findAll(page, size);
+    public Response findAll(@QueryParam("page") @DefaultValue("0") int page,  @QueryParam("size") @DefaultValue("10") int size,
+                            @QueryParam("name") @DefaultValue("") String name) {
+        return productoService.findAll(page, size, name);
     }
 
     @GET
