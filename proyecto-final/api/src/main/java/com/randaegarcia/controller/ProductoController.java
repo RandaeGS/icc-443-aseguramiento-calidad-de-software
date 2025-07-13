@@ -1,5 +1,6 @@
 package com.randaegarcia.controller;
 
+import com.randaegarcia.domain.dto.ProductoListRequestDto;
 import com.randaegarcia.domain.model.Producto;
 import com.randaegarcia.service.ProductoService;
 import io.quarkus.security.Authenticated;
@@ -25,8 +26,11 @@ public class ProductoController {
 
     @GET
     public Response findAll(@QueryParam("page") @DefaultValue("0") int page,  @QueryParam("size") @DefaultValue("10") int size,
-                            @QueryParam("name") @DefaultValue("") String name) {
-        return productoService.findAll(page, size, name);
+                            @QueryParam("name") @DefaultValue("") String name, @QueryParam("category") @DefaultValue("") String category,
+                            @QueryParam("minPrice") @DefaultValue("0")  double minPrice, @QueryParam("maxPrice") @DefaultValue("-1") double maxPrice) {
+
+        ProductoListRequestDto requestDto = new ProductoListRequestDto(page, size, name, category, minPrice, maxPrice);
+        return productoService.findAll(requestDto);
     }
 
     @GET

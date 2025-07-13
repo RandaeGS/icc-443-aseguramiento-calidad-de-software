@@ -1,7 +1,3 @@
 package com.randaegarcia.domain.dto;
 
-import jakarta.ws.rs.DefaultValue;
-
-public record ProductoListRequestDto(@DefaultValue("0") int page,@DefaultValue("10") int size, String name){
-
-}
+public record ProductoListRequestDto(int page, int size, String name, String category, double minPrice, double maxPrice) { }

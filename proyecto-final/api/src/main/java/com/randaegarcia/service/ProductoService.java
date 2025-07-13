@@ -1,6 +1,7 @@
 package com.randaegarcia.service;
 
 import com.randaegarcia.domain.dto.PaginatedResponse;
+import com.randaegarcia.domain.dto.ProductoListRequestDto;
 import com.randaegarcia.domain.model.Producto;
 import com.randaegarcia.exception.ConflictException;
 import com.speedment.jpastreamer.application.JPAStreamer;
@@ -13,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 @Slf4j
 @ApplicationScoped
@@ -20,18 +23,29 @@ import java.util.List;
 public class ProductoService {
     private final JPAStreamer jpaStreamer;
 
-    public Response findAll(int page, int size, String name) {
-        long total = Producto.find("isActive", true).count();
+    public Response findAll(ProductoListRequestDto requestDto) {
+        Supplier<Stream<Producto>> filteredStreamSupplier = () ->
+                jpaStreamer.stream(Producto.class)
+                        .filter(Producto::getIsActive)
+                        .filter(producto -> producto.getName().toLowerCase().startsWith(requestDto.name().toLowerCase()))
+                        .filter(producto -> producto.getCategory().equals(requestDto.category()) || requestDto.category().isEmpty())
+                        .filter(producto -> producto.getPrice() >= requestDto.minPrice() && (producto.getPrice() <= requestDto.maxPrice() || requestDto.maxPrice() == -1));
 
-        List<Producto> productoList = jpaStreamer.stream(Producto.class)
-                .skip((long) page * size)
-                .limit(size)
-                .filter(Producto::getIsActive)
-                .filter(producto -> producto.getName().toLowerCase().startsWith(name.toLowerCase()))
+        // Conteo total con filtros aplicados
+        long total = filteredStreamSupplier.get().count();
+
+        List<Producto> productoList = filteredStreamSupplier.get()
                 .sorted((o1, o2) -> o2.id.compareTo(o1.id))
+                .skip((long) requestDto.page() * requestDto.size())
+                .limit(requestDto.size())
                 .toList();
 
-        PaginatedResponse<Producto> response = PaginatedResponse.of(productoList, page, size, total);
+        PaginatedResponse<Producto> response = PaginatedResponse.of(
+                productoList,
+                requestDto.page(),
+                requestDto.size(),
+                total
+        );
 
         jpaStreamer.close();
         return Response.ok(response).build();

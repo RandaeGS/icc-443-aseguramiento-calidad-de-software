@@ -119,6 +119,8 @@ const product = reactive({
     quantity: 0
 });
 
+const categoryList = ['Fitness', 'Electronics', 'Clothing', 'Accessories'];
+
 const submitForm = async () => {
     if (validateProduct()) {
         if (product.id === undefined) {
@@ -200,6 +202,31 @@ const filters = reactive({
     minPrice: undefined,
     category: undefined
 });
+const filtersDialog = ref(false);
+
+const applyFilters = () => {
+    if (filters.minPrice > filters.maxPrice) {
+        toast.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Min price cannot be greater',
+            life: 3000
+        });
+        return;
+    }
+
+    filtersDialog.value = false;
+    loadList();
+};
+
+const clearFilters = () => {
+    filters.minPrice = undefined;
+    filters.maxPrice = undefined;
+    filters.name = undefined;
+    filters.category = undefined;
+    filtersDialog.value = false;
+    loadList();
+};
 
 const loadList = async () => {
     try {
@@ -207,7 +234,10 @@ const loadList = async () => {
             params: {
                 page: page.value,
                 size: size.value,
-                name: filters.name
+                name: filters.name,
+                category: filters.category,
+                minPrice: filters.minPrice,
+                maxPrice: filters.maxPrice
             }
         });
         productPage.value = response.data;
@@ -228,6 +258,7 @@ const paginate = async (paginator) => {
     await loadList();
 };
 
+// Hooks
 onMounted(() => {
     loadList();
 });
@@ -298,12 +329,15 @@ const callIntegrationApi = async () => {
                 <template #header>
                     <div class="flex flex-wrap gap-2 items-center justify-between">
                         <h4 class="m-0">Manage Products</h4>
-                        <IconField>
-                            <InputIcon>
-                                <i class="pi pi-search" />
-                            </InputIcon>
-                            <InputText v-model="filters.name" @keyup.enter="loadList" placeholder="Search..." />
-                        </IconField>
+                        <div class="flex gap-2">
+                            <Button icon="pi pi-filter" @click="filtersDialog = true" />
+                            <InputGroup>
+                                <InputText v-model="filters.name" @keyup.enter="loadList" placeholder="Search..." />
+                                <InputGroupAddon>
+                                    <Button icon="pi pi-search" severity="secondary" variant="text" @click="loadList" />
+                                </InputGroupAddon>
+                            </InputGroup>
+                        </div>
                     </div>
                 </template>
 
@@ -345,25 +379,8 @@ const callIntegrationApi = async () => {
                 </div>
 
                 <div>
-                    <span class="block font-bold mb-4">Category</span>
-                    <div class="grid grid-cols-12 gap-4">
-                        <div class="flex items-center gap-2 col-span-6">
-                            <RadioButton id="category1" v-model="product.category" name="category" value="Accessories" />
-                            <label for="category1">Accessories</label>
-                        </div>
-                        <div class="flex items-center gap-2 col-span-6">
-                            <RadioButton id="category2" v-model="product.category" name="category" value="Clothing" />
-                            <label for="category2">Clothing</label>
-                        </div>
-                        <div class="flex items-center gap-2 col-span-6">
-                            <RadioButton id="category3" v-model="product.category" name="category" value="Electronics" />
-                            <label for="category3">Electronics</label>
-                        </div>
-                        <div class="flex items-center gap-2 col-span-6">
-                            <RadioButton id="category4" v-model="product.category" name="category" value="Fitness" />
-                            <label for="category4">Fitness</label>
-                        </div>
-                    </div>
+                    <label for="category" class="block font-bold mb-3">Category</label>
+                    <Select id="category" name="category" v-model="product.category" :options="categoryList" fluid />
                     <small v-if="errors.category" class="text-red-500">{{ errors.category }}.</small>
                 </div>
 
@@ -383,7 +400,7 @@ const callIntegrationApi = async () => {
                 <div class="grid grid-cols-12 gap-4">
                     <div class="col-span-6">
                         <label for="profit" class="block font-bold mb-3">Profit</label>
-                        <InputNumber id="profit" v-model="product.profit" mode="currency" currency="USD" locale="en-US" fluid />
+                        <InputNumber id="profit" v-model="product.profit" mode="currency" currency="USD" locale="en-US" fluid readonly />
                     </div>
                     <div class="col-span-6">
                         <label for="quantity" class="block font-bold mb-3">Quantity</label>
@@ -421,6 +438,31 @@ const callIntegrationApi = async () => {
             <template #footer>
                 <Button label="No" icon="pi pi-times" text @click="deleteProductsDialog = false" />
                 <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedProducts" />
+            </template>
+        </Dialog>
+
+        <Dialog v-model:visible="filtersDialog" header="Filters" :modal="true">
+            <div class="flex flex-col gap-4">
+                <div>
+                    <label for="categoryFilter" class="block font-bold mb-3">Category</label>
+                    <Select id="categoryFilter" name="categoryFilter" v-model.trim="filters.category" :options="categoryList" autofocus fluid />
+                </div>
+
+                <div class="grid grid-cols-12 gap-4">
+                    <div class="col-span-6">
+                        <label for="minPrice" class="block font-bold mb-3">Minimum Price</label>
+                        <InputNumber id="minPrice" name="minPrice" v-model="filters.minPrice" mode="currency" currency="USD" locale="en-US" fluid />
+                    </div>
+                    <div class="col-span-6">
+                        <label for="minPrice" class="block font-bold mb-3">Maximum Price</label>
+                        <InputNumber id="maxPrice" name="maxPrice" v-model="filters.maxPrice" mode="currency" currency="USD" locale="en-US" fluid />
+                    </div>
+                </div>
+            </div>
+
+            <template #footer>
+                <Button label="Clear" icon="pi pi-filter-slash" text @click="clearFilters" />
+                <Button label="Apply" icon="pi pi-filter" text @click="applyFilters" />
             </template>
         </Dialog>
     </div>
