@@ -58,4 +58,19 @@ public class ProductoController {
     public Response deleteProducto(@PathParam("id") Long id) {
         return productoService.deleteProducto(id);
     }
+
+    @Path("{id}/history")
+    @GET
+    public Response findProductoHistory(@NotNull @PathParam("id") Long id,
+                                        @QueryParam("page") @DefaultValue("0") int page,
+                                        @QueryParam("size") @DefaultValue("10") int size) {
+        return productoService.getQuantityHistory(id, page, size);
+    }
+
+    @Path("{id}/update-quantity")
+    @PUT
+    @Transactional
+    public Response updateProductoQuantity(@NotNull @PathParam("id") Long idProducto, @NotNull @QueryParam("quantity") Long quantity) {
+        return productoService.updateQuantity(idProducto, quantity);
+    }
 }

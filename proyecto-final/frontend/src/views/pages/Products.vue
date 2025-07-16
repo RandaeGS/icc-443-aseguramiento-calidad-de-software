@@ -45,9 +45,13 @@ function deleteSelectedProducts() {
 
 // Dialog controls
 const hideDialog = () => {
-    Object.assign(product, cleanProduct);
     errors.value = {};
     productDialog.value = false;
+    deleteProductsDialog.value = false;
+    deleteProductDialog.value = false;
+    stockDialog.value = false;
+    stockQuantity.value = 0;
+    Object.assign(product, cleanProduct);
 };
 
 //Validation
@@ -258,6 +262,45 @@ const paginate = async (paginator) => {
     await loadList();
 };
 
+// Stock
+const stockDialog = ref(false);
+const stockQuantity = ref(0);
+
+const showStockDialog = (selectedProduct) => {
+    Object.assign(product, selectedProduct);
+    stockDialog.value = true;
+};
+
+const productMovement = async () => {
+    console.log(stockQuantity.value);
+    try {
+        await axiosInstance.put(
+            `/productos/${product.id}/update-quantity`,
+            {},
+            {
+                params: {
+                    quantity: stockQuantity.value
+                }
+            }
+        );
+        toast.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Quantity has been updated',
+            life: 3000
+        });
+        hideDialog();
+    } catch (error) {
+        console.error(error);
+        toast.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Error updating quantity',
+            life: 3000
+        });
+    }
+};
+
 // Hooks
 onMounted(() => {
     loadList();
@@ -289,6 +332,15 @@ const callIntegrationApi = async () => {
             detail: 'Error during process',
             life: 3000
         });
+    }
+};
+
+const testHistory = async (product) => {
+    try {
+        const response = await axiosInstance.get(`/productos/${product.id}/history`);
+        console.log(response.data);
+    } catch (error) {
+        console.error(error);
     }
 };
 </script>
@@ -355,7 +407,14 @@ const callIntegrationApi = async () => {
                         {{ formatCurrency(slotProps.data.cost) }}
                     </template>
                 </Column>
-                <Column :exportable="false" style="min-width: 12rem">
+                <Column header="Stock" :exportable="false" style="min-width: 1rem">
+                    <template #body="slotProps">
+                        <Button icon="pi pi-arrow-right-arrow-left" outlined rounded class="mr-2" @click="showStockDialog(slotProps.data)" />
+                        <Button icon="pi pi-warehouse" outlined rounded severity="info" />
+                        <Button label="Test" icon="pi pi-upload" severity="secondary" @click="testHistory(slotProps.data)" />
+                    </template>
+                </Column>
+                <Column header="Actions" :exportable="false" style="min-width: 2rem">
                     <template #body="slotProps">
                         <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editProduct(slotProps.data)" />
                         <Button icon="pi pi-trash" outlined rounded severity="danger" @click="confirmDeleteProduct(slotProps.data)" />
@@ -425,7 +484,7 @@ const callIntegrationApi = async () => {
                 >
             </div>
             <template #footer>
-                <Button label="No" icon="pi pi-times" text @click="deleteProductDialog = false" />
+                <Button label="No" icon="pi pi-times" text @click="hideDialog" />
                 <Button label="Yes" icon="pi pi-check" @click="deleteProduct" />
             </template>
         </Dialog>
@@ -436,7 +495,7 @@ const callIntegrationApi = async () => {
                 <span v-if="product">Are you sure you want to delete the selected products?</span>
             </div>
             <template #footer>
-                <Button label="No" icon="pi pi-times" text @click="deleteProductsDialog = false" />
+                <Button label="No" icon="pi pi-times" text @click="hideDialog" />
                 <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedProducts" />
             </template>
         </Dialog>
@@ -463,6 +522,24 @@ const callIntegrationApi = async () => {
             <template #footer>
                 <Button label="Clear" icon="pi pi-filter-slash" text @click="clearFilters" />
                 <Button label="Apply" icon="pi pi-filter" text @click="applyFilters" />
+            </template>
+        </Dialog>
+
+        <Dialog v-model:visible="stockDialog" header="Product Movement" :modal="true">
+            <div class="flex flex-col gap-4">
+                <div>
+                    <label for="stockProduct" class="block font-bold mb-3">Quantity</label>
+                    <InputText id="stockProduct" name="stockProduct" v-model="product.name" fluid readonly />
+                </div>
+                <div>
+                    <label for="stock" class="block font-bold mb-3">Quantity</label>
+                    <InputNumber id="stock" name="stock" v-model="stockQuantity" fluid />
+                </div>
+            </div>
+
+            <template #footer>
+                <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
+                <Button label="Accept" icon="pi pi-check" text @click="productMovement" />
             </template>
         </Dialog>
     </div>
