@@ -6,6 +6,7 @@ import axiosInstance from '@/plugins/axios';
 import { z } from 'zod';
 import { Form } from '@primevue/forms';
 import { useKeycloak } from '@dsb-norge/vue-keycloak-js';
+import router from '@/router';
 
 onMounted(() => {
     ProductService.getProducts().then((data) => (products.value = data));
@@ -264,7 +265,7 @@ const paginate = async (paginator) => {
 
 // Stock
 const stockDialog = ref(false);
-const stockQuantity = ref(0);
+const stockQuantity = ref();
 
 const showStockDialog = (selectedProduct) => {
     Object.assign(product, selectedProduct);
@@ -335,13 +336,8 @@ const callIntegrationApi = async () => {
     }
 };
 
-const testHistory = async (product) => {
-    try {
-        const response = await axiosInstance.get(`/productos/${product.id}/history`);
-        console.log(response.data);
-    } catch (error) {
-        console.error(error);
-    }
+const viewHistory = (val) => {
+    router.push({ name: 'history', params: { id: val.id } });
 };
 </script>
 
@@ -410,8 +406,7 @@ const testHistory = async (product) => {
                 <Column header="Stock" :exportable="false" style="min-width: 1rem">
                     <template #body="slotProps">
                         <Button icon="pi pi-arrow-right-arrow-left" outlined rounded class="mr-2" @click="showStockDialog(slotProps.data)" />
-                        <Button icon="pi pi-warehouse" outlined rounded severity="info" />
-                        <Button label="Test" icon="pi pi-upload" severity="secondary" @click="testHistory(slotProps.data)" />
+                        <Button icon="pi pi-warehouse" outlined rounded severity="info" @click="viewHistory(slotProps.data)" />
                     </template>
                 </Column>
                 <Column header="Actions" :exportable="false" style="min-width: 2rem">
@@ -533,7 +528,7 @@ const testHistory = async (product) => {
                 </div>
                 <div>
                     <label for="stock" class="block font-bold mb-3">Quantity</label>
-                    <InputNumber id="stock" name="stock" v-model="stockQuantity" fluid />
+                    <InputNumber id="stock" name="stock" v-model="stockQuantity" fluid autofocus />
                 </div>
             </div>
 

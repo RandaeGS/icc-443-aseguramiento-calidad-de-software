@@ -76,7 +76,7 @@ public class ProductoService {
     }
 
     public Producto findById(Long id) {
-        return Producto.findById(id);
+        return Producto.find("id = ?1 and isActive = true", id).firstResult();
     }
 
     public Response update(@NotNull @Valid Producto producto) {
@@ -117,47 +117,45 @@ public class ProductoService {
 
         AuditReader auditReader = AuditReaderFactory.get(em);
 
-        // Paso 1: Obtener conteo total de revisiones
-        AuditQuery countQuery = auditReader.createQuery()
-                .forRevisionsOfEntity(Producto.class, false, false)
-                .add(AuditEntity.id().eq(id));
-
-        long totalRevisions = countQuery.getResultList().size();
-
-        // Paso 2: Calcular paginación inversa (más recientes primero)
-        // Como queremos los más recientes primero, calculamos desde el final
-        int totalPages = (int) Math.ceil((double) totalRevisions / size);
-        int startFromEnd = page * size;
-        int endFromEnd = startFromEnd + size;
-
-        // Convertir a índices desde el inicio
-        int startIndex = Math.max(0, (int) totalRevisions - endFromEnd);
-        int querySize = Math.min(size + 1, (int) totalRevisions - startIndex); // +1 para calcular cambios
-
-        // Paso 3: Obtener revisiones paginadas
-        AuditQuery paginatedQuery = auditReader.createQuery()
+        // Paso 1: Obtener TODAS las revisiones y procesarlas (para datasets medianos)
+        AuditQuery allRevisionsQuery = auditReader.createQuery()
                 .forRevisionsOfEntity(Producto.class, false, true)
                 .add(AuditEntity.id().eq(id))
-                .addOrder(AuditEntity.revisionNumber().asc())
-                .setFirstResult(startIndex)
-                .setMaxResults(querySize);
+                .addOrder(AuditEntity.revisionNumber().asc()); // Orden ascendente para procesamiento
 
-        List<Object[]> revisions = paginatedQuery.getResultList();
+        List<Object[]> allRevisions = allRevisionsQuery.getResultList();
 
-        // Paso 4: Procesar solo cambios de cantidad
-        List<QuantityHistoryDto> quantityChanges = processQuantityChanges(revisions);
+        // Paso 2: Procesar todos los cambios de cantidad
+        List<QuantityHistoryDto> allQuantityChanges = processQuantityChanges(allRevisions);
 
-        // Paso 5: Revertir para mostrar más reciente primero y aplicar límite
-        Collections.reverse(quantityChanges);
-        int actualSize = Math.min(size, quantityChanges.size());
-        List<QuantityHistoryDto> finalContent = quantityChanges.subList(0, actualSize);
+        // Paso 3: Invertir para tener los más recientes primero
+        Collections.reverse(allQuantityChanges);
 
-        // Paso 6: Crear respuesta paginada
+        // Paso 4: Aplicar paginación manual a los resultados procesados
+        long totalElements = allQuantityChanges.size();
+        int startIndex = page * size;
+        int endIndex = Math.min(startIndex + size, allQuantityChanges.size());
+
+        // Validar que el startIndex no esté fuera de rango
+        if (startIndex >= totalElements) {
+            // Página fuera de rango, devolver página vacía
+            PaginatedResponse<QuantityHistoryDto> emptyResponse = PaginatedResponse.of(
+                    Collections.emptyList(),
+                    page,
+                    size,
+                    totalElements
+            );
+            return Response.ok(emptyResponse).build();
+        }
+
+        List<QuantityHistoryDto> paginatedContent = allQuantityChanges.subList(startIndex, endIndex);
+
+        // Paso 5: Crear respuesta paginada
         PaginatedResponse<QuantityHistoryDto> response = PaginatedResponse.of(
-                finalContent,
+                paginatedContent,
                 page,
                 size,
-                totalRevisions
+                totalElements
         );
 
         return Response.ok(response).build();

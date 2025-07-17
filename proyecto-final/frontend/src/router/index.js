@@ -26,6 +26,21 @@ const router = createRouter({
                     meta: { requiresAuth: true }
                 },
                 {
+                    path: ':id/history',
+                    name: 'history',
+                    component: () => import('@/views/pages/ProductHistory.vue'),
+                    props: true,
+                    meta: { requiresAuth: true },
+                    beforeEnter: (to, from, next) => {
+                        const id = parseInt(to.params.id);
+                        if (isNaN(id) || id <= 0) {
+                            next('/products');
+                        } else {
+                            next();
+                        }
+                    }
+                },
+                {
                     path: '/uikit/formlayout',
                     name: 'formlayout',
                     component: () => import('@/views/uikit/FormLayout.vue')
@@ -169,21 +184,13 @@ function waitForKeycloak() {
 // Navigation Guard
 router.beforeEach(async (to, from, next) => {
     try {
-        console.log('Navigation to:', to.path);
-
         // Esperar a que Keycloak esté listo
         await waitForKeycloak();
 
         const keycloak = useKeycloak();
         const requiresAuth = to.matched.some((record) => record.meta.requiresAuth === true);
 
-        console.log('Keycloak ready, checking auth:', {
-            requiresAuth,
-            authenticated: keycloak.authenticated
-        });
-
         if (requiresAuth && !keycloak.authenticated) {
-            console.log('Redirecting to Keycloak login');
             await keycloak.login({
                 redirectUri: window.location.origin + to.fullPath
             });
