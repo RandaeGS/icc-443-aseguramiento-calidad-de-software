@@ -70,6 +70,9 @@ public class ProductoService {
         if (Producto.existsByNombre(producto.name)) {
             throw new ConflictException("Nombre de producto ya existe");
         }
+        if (producto.quantity < producto.minimumStock){
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
         producto.isActive = true;
         producto.persist();
         return Response.ok(producto).build();

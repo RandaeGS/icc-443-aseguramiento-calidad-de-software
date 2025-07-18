@@ -3,6 +3,7 @@ package com.randaegarcia.domain.model;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
@@ -47,6 +48,12 @@ public class Producto extends PanacheEntity {
     @PositiveOrZero
     @Column(nullable = false)
     public Long quantity;
+
+    @NotNull
+    @Min(value = 0)
+    @PositiveOrZero
+    @Column(name = "minimum_stock", nullable = false)
+    public Long minimumStock;
 
     @Column(name = "is_active", nullable = false)
     public Boolean isActive;

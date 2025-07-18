@@ -1,0 +1,2 @@
+ALTER TABLE producto_aud
+ADD COLUMN minimum_stock BIGINT DEFAULT 0 NOT NULL;

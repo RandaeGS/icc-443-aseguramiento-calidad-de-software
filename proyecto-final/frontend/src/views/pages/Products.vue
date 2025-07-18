@@ -65,8 +65,15 @@ const productSchema = z.object({
     price: z.number().gt(0, { message: 'Price must be greater than 0' }),
     cost: z.number().gt(0, { message: 'Cost must be greater than 0' }),
     quantity: z.number().gte(0, { message: 'Quantity must be 0 or greater' }),
+    minimumStock: z.number().gte(0, { message: 'Minimum stock must be 0 or greater' }),
     profit: z.number().optional()
-});
+}).refine(
+    (data) => data.quantity >= data.minimumStock,
+    {
+        message: 'Quantity must be greater than or equal to minimum stock',
+        path: ['quantity'],
+    }
+);
 
 const validateProduct = () => {
     try {
@@ -121,7 +128,8 @@ const product = reactive({
     price: 0,
     cost: 0,
     profit: 0,
-    quantity: 0
+    quantity: 0,
+    minimumStock: 0
 });
 
 const categoryList = ['Fitness', 'Electronics', 'Clothing', 'Accessories'];
@@ -194,7 +202,8 @@ let cleanProduct = {
     price: null,
     cost: null,
     profit: null,
-    quantity: null
+    quantity: null,
+    minimumStock: null
 };
 
 // List
@@ -432,10 +441,17 @@ const viewHistory = (val) => {
                     <small v-if="errors.description" class="text-red-500">{{ errors.description }}.</small>
                 </div>
 
-                <div>
-                    <label for="category" class="block font-bold mb-3">Category</label>
-                    <Select id="category" name="category" v-model="product.category" :options="categoryList" fluid />
-                    <small v-if="errors.category" class="text-red-500">{{ errors.category }}.</small>
+                <div class="grid grid-cols-12 gap-4">
+                    <div class="col-span-6">
+                        <label for="category" class="block font-bold mb-3">Category</label>
+                        <Select id="category" name="category" v-model="product.category" :options="categoryList" fluid />
+                        <small v-if="errors.category" class="text-red-500">{{ errors.category }}.</small>
+                    </div>
+                    <div class="col-span-6">
+                        <label for="minimumStock" class="block font-bold mb-3">Min. Stock</label>
+                        <InputNumber id="minimumStock" name="minimumStock" v-model="product.minimumStock"  fluid />
+                        <small v-if="errors.minimumStock" class="text-red-500">{{ errors.minimumStock }}.</small>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-12 gap-4">

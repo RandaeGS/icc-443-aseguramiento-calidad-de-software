@@ -184,7 +184,6 @@ function waitForKeycloak() {
 // Navigation Guard
 router.beforeEach(async (to, from, next) => {
     try {
-        // Esperar a que Keycloak esté listo
         await waitForKeycloak();
 
         const keycloak = useKeycloak();
