@@ -8,6 +8,7 @@ import com.randaegarcia.domain.model.Producto;
 import com.randaegarcia.domain.model.StockMovement;
 import com.randaegarcia.domain.model.StockMovement$;
 import com.randaegarcia.exception.ConflictException;
+import com.randaegarcia.exception.StockExceededException;
 import com.randaegarcia.security.CustomRevisionEntity;
 import com.speedment.jpastreamer.application.JPAStreamer;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -124,7 +125,7 @@ public class ProductoService {
     public Response deleteProducto(Long id) {
         Producto producto = Producto.findById(id);
         if (producto == null || !producto.isActive) {
-            throw new NotFoundException("Producto no encontrado");
+            throw new NotFoundException("Product not found");
         }
         producto.isActive = false;
         producto.persist();
@@ -134,7 +135,7 @@ public class ProductoService {
     public Response getQuantityHistory(Long id, int page, int size) {
         Producto producto = Producto.find("id = ?1 and isActive = true", id).firstResult();
         if (producto == null || !producto.isActive) {
-            throw new NotFoundException("Producto no encontrado");
+            throw new NotFoundException("Product not found");
         }
 
         List<StockMovement> stockMovements = jpaStreamer.stream(StockMovement.class)
@@ -156,7 +157,11 @@ public class ProductoService {
     public Response updateQuantity(@NotNull Long idProducto, @NotNull Long quantity) {
         Producto producto = Producto.findById(idProducto);
         if (producto == null || !producto.isActive) {
-            throw new NotFoundException("Producto no encontrado");
+            throw new NotFoundException("Product not found");
+        }
+
+        if (producto.quantity + quantity < producto.minimumStock) {
+            throw new StockExceededException("Minimum stock exceeded");
         }
 
         var stockMovement = new StockMovement();

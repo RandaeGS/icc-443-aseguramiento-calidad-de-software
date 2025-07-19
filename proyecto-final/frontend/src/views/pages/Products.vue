@@ -275,9 +275,11 @@ const paginate = async (paginator) => {
 // Stock
 const stockDialog = ref(false);
 const stockQuantity = ref();
+const stockError = ref('')
 
 const showStockDialog = (selectedProduct) => {
     Object.assign(product, selectedProduct);
+    stockError.value = ''
     stockDialog.value = true;
 };
 
@@ -300,7 +302,11 @@ const productMovement = async () => {
         });
         hideDialog();
     } catch (error) {
-        console.error(error);
+        let errorMessage = error.response.data.message;
+        if (errorMessage === 'Minimum stock exceeded') {
+            stockError.value = errorMessage;
+        }
+        console.error(error.response.data.message);
         toast.add({
             severity: 'error',
             summary: 'Error',
@@ -548,15 +554,16 @@ const getRowClass = (data) => {
             </template>
         </Dialog>
 
-        <Dialog v-model:visible="stockDialog" header="Product Movement" :modal="true">
+        <Dialog v-model:visible="stockDialog" header="Product Movement" class="lg:w-1/6 sm:w-1/3" :modal="true">
             <div class="flex flex-col gap-4">
                 <div>
-                    <label for="stockProduct" class="block font-bold mb-3">Quantity</label>
+                    <label for="stockProduct" class="block font-bold mb-3">Product</label>
                     <InputText id="stockProduct" name="stockProduct" v-model="product.name" fluid readonly />
                 </div>
                 <div>
                     <label for="stock" class="block font-bold mb-3">Quantity</label>
                     <InputNumber id="stock" name="stock" v-model="stockQuantity" fluid autofocus />
+                    <small v-if="stockError.length > 0" class="text-red-500 block">{{ stockError }}.</small>
                 </div>
             </div>
 
