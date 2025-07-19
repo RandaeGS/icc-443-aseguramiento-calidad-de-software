@@ -1,0 +1,1 @@
+ALTER SEQUENCE stock_movements_SEQ INCREMENT BY 50;

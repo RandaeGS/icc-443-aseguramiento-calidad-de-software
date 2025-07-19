@@ -3,9 +3,6 @@ package com.randaegarcia.controller;
 import com.randaegarcia.domain.dto.ProductoListRequestDto;
 import com.randaegarcia.domain.model.Producto;
 import com.randaegarcia.service.ProductoService;
-import io.quarkus.security.Authenticated;
-import io.quarkus.security.PermissionsAllowed;
-import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -13,10 +10,10 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
-import org.jboss.resteasy.reactive.RestQuery;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 
-import java.util.List;
-
+@Slf4j
 @Path("/productos")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiredArgsConstructor

@@ -5,6 +5,7 @@ import com.randaegarcia.domain.dto.PaginatedResponse;
 import com.randaegarcia.domain.dto.ProductoListRequestDto;
 import com.randaegarcia.domain.dto.QuantityHistoryDto;
 import com.randaegarcia.domain.model.Producto;
+import com.randaegarcia.domain.model.StockMovement;
 import com.randaegarcia.exception.ConflictException;
 import com.randaegarcia.security.CustomRevisionEntity;
 import com.speedment.jpastreamer.application.JPAStreamer;
@@ -12,11 +13,13 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
 import org.hibernate.envers.query.AuditEntity;
@@ -37,6 +40,7 @@ import java.util.stream.Stream;
 public class ProductoService {
     private final JPAStreamer jpaStreamer;
     private final EntityManager em;
+    private final JsonWebToken jwt;
 
     public Response findAll(ProductoListRequestDto requestDto) {
         Supplier<Stream<Producto>> filteredStreamSupplier = () ->
@@ -75,6 +79,14 @@ public class ProductoService {
         }
         producto.isActive = true;
         producto.persist();
+
+        var stockMovement = new StockMovement();
+        stockMovement.producto = producto;
+        stockMovement.date = LocalDateTime.now();
+        stockMovement.quantityChange = producto.quantity;
+        stockMovement.actualQuantity = producto.quantity;
+        stockMovement.username = jwt.getClaim("name");
+        stockMovement.persist();
         return Response.ok(producto).build();
     }
 
@@ -93,6 +105,15 @@ public class ProductoService {
         oldProducto.price = producto.price;
         oldProducto.cost = producto.cost;
         oldProducto.profit = producto.profit;
+        if (oldProducto.quantity != producto.quantity) {
+            var stockMovement = new StockMovement();
+            stockMovement.producto = producto;
+            stockMovement.date = LocalDateTime.now();
+            stockMovement.quantityChange = Math.max(oldProducto.quantity, producto.quantity) - Math.min(oldProducto.quantity, producto.quantity);
+            stockMovement.actualQuantity = producto.quantity;
+            stockMovement.username = jwt.getClaim("name");
+            stockMovement.persist();
+        }
         oldProducto.quantity = producto.quantity;
 
         return Response.ok(oldProducto).build();
@@ -208,7 +229,16 @@ public class ProductoService {
         if (producto == null || !producto.isActive) {
             throw new NotFoundException("Producto no encontrado");
         }
+
+        var stockMovement = new StockMovement();
+        stockMovement.producto = producto;
+        stockMovement.actualQuantity = producto.quantity;
+        stockMovement.username = jwt.getClaim("name");
+        stockMovement.date = LocalDateTime.now();
+        stockMovement.quantityChange = quantity;
         producto.quantity += quantity;
+        stockMovement.actualQuantity = producto.quantity;
+        stockMovement.persist();
         return Response.ok(producto).build();
     }
 }
