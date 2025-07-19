@@ -282,7 +282,6 @@ const showStockDialog = (selectedProduct) => {
 };
 
 const productMovement = async () => {
-    console.log(stockQuantity.value);
     try {
         await axiosInstance.put(
             `/productos/${product.id}/update-quantity`,
@@ -348,6 +347,14 @@ const callIntegrationApi = async () => {
 const viewHistory = (val) => {
     router.push({ name: 'history', params: { id: val.id } });
 };
+
+const getRowClass = (data) => {
+    if (data.quantity <= data.minimumStock * 1.1) {
+        console.log(data);
+        return '!bg-orange-100';
+    }
+    return '';
+}
 </script>
 
 <template>
@@ -374,6 +381,7 @@ const viewHistory = (val) => {
                 :value="productPage.content"
                 :rows="size"
                 :totalRecords="productPage.totalElements"
+                :rowClass="getRowClass"
                 @page="paginate"
                 lazy
                 paginator
@@ -385,7 +393,11 @@ const viewHistory = (val) => {
             >
                 <template #header>
                     <div class="flex flex-wrap gap-2 items-center justify-between">
-                        <h4 class="m-0">Manage Products</h4>
+                        <div class="flex items-center gap-2 text-sm text-gray-600">
+                            <h4 class="m-0">Manage Products</h4>
+                            <div class="w-4 h-4 bg-orange-100 border border-orange-200 rounded"></div>
+                            <span>Low Stock</span>
+                        </div>
                         <div class="flex gap-2">
                             <Button icon="pi pi-filter" @click="filtersDialog = true" />
                             <InputGroup>
