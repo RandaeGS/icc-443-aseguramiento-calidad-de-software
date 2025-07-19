@@ -110,11 +110,11 @@ onMounted(() => {
             show-gridlines
             striped-rows
         >
-            <Column field="quantity" header="Quantity" style="min-width: 2rem"></Column>
+            <Column field="actualQuantity" header="Quantity" style="min-width: 2rem"></Column>
             <Column field="quantityChange" header="Quantity change" style="min-width: 2rem"></Column>
-            <Column field="revisionDate" header="Date" style="min-width: 2rem">
+            <Column field="date" header="Date" style="min-width: 2rem">
                 <template #body="slotProps">
-                    {{ formatDate(slotProps.data.revisionDate) }}
+                    {{ formatDate(slotProps.data.date) }}
                 </template>
             </Column>
             <Column field="username" header="By user" style="min-width: 2rem"></Column>

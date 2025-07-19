@@ -6,6 +6,7 @@ import com.randaegarcia.domain.dto.ProductoListRequestDto;
 import com.randaegarcia.domain.dto.QuantityHistoryDto;
 import com.randaegarcia.domain.model.Producto;
 import com.randaegarcia.domain.model.StockMovement;
+import com.randaegarcia.domain.model.StockMovement$;
 import com.randaegarcia.exception.ConflictException;
 import com.randaegarcia.security.CustomRevisionEntity;
 import com.speedment.jpastreamer.application.JPAStreamer;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -130,98 +132,25 @@ public class ProductoService {
     }
 
     public Response getQuantityHistory(Long id, int page, int size) {
-        if (!Producto.existsById(id)) {
+        Producto producto = Producto.find("id = ?1 and isActive = true", id).firstResult();
+        if (producto == null || !producto.isActive) {
             throw new NotFoundException("Producto no encontrado");
         }
 
-        // Validar parámetros de paginación
-        if (page < 0 || size <= 0 || size > 100) {
-            throw new IllegalArgumentException("Parámetros de paginación inválidos");
-        }
+        List<StockMovement> stockMovements = jpaStreamer.stream(StockMovement.class)
+                .filter(stockMovement -> stockMovement.producto.id.equals(id))
+                .sorted(StockMovement$.date.reversed())
+                .skip((long) page * size)
+                .limit(size)
+                .collect(Collectors.toList());
 
-        AuditReader auditReader = AuditReaderFactory.get(em);
-
-        // Paso 1: Obtener TODAS las revisiones y procesarlas (para datasets medianos)
-        AuditQuery allRevisionsQuery = auditReader.createQuery()
-                .forRevisionsOfEntity(Producto.class, false, true)
-                .add(AuditEntity.id().eq(id))
-                .addOrder(AuditEntity.revisionNumber().asc()); // Orden ascendente para procesamiento
-
-        List<Object[]> allRevisions = allRevisionsQuery.getResultList();
-
-        // Paso 2: Procesar todos los cambios de cantidad
-        List<QuantityHistoryDto> allQuantityChanges = processQuantityChanges(allRevisions);
-
-        // Paso 3: Invertir para tener los más recientes primero
-        Collections.reverse(allQuantityChanges);
-
-        // Paso 4: Aplicar paginación manual a los resultados procesados
-        long totalElements = allQuantityChanges.size();
-        int startIndex = page * size;
-        int endIndex = Math.min(startIndex + size, allQuantityChanges.size());
-
-        // Validar que el startIndex no esté fuera de rango
-        if (startIndex >= totalElements) {
-            // Página fuera de rango, devolver página vacía
-            PaginatedResponse<QuantityHistoryDto> emptyResponse = PaginatedResponse.of(
-                    Collections.emptyList(),
-                    page,
-                    size,
-                    totalElements
-            );
-            return Response.ok(emptyResponse).build();
-        }
-
-        List<QuantityHistoryDto> paginatedContent = allQuantityChanges.subList(startIndex, endIndex);
-
-        // Paso 5: Crear respuesta paginada
-        PaginatedResponse<QuantityHistoryDto> response = PaginatedResponse.of(
-                paginatedContent,
+        PaginatedResponse<StockMovement> response = PaginatedResponse.of(
+                stockMovements,
                 page,
                 size,
-                totalElements
+                StockMovement.count("producto = ?1", producto)
         );
-
         return Response.ok(response).build();
-    }
-
-    // Metodo auxiliar para procesar cambios de cantidad
-    private List<QuantityHistoryDto> processQuantityChanges(List<Object[]> revisions) {
-        List<QuantityHistoryDto> quantityChanges = new ArrayList<>();
-        Long previousQuantity = null;
-
-        for (Object[] revision : revisions) {
-            Producto producto = (Producto) revision[0];
-            CustomRevisionEntity revisionEntity = (CustomRevisionEntity) revision[1];
-
-            // Extraer información de tu CustomRevisionEntity
-            String username = revisionEntity.getUsername();
-            long timestamp = revisionEntity.getRevtstmp();
-
-            // Solo agregar si hay cambio en cantidad
-            if (previousQuantity == null || !previousQuantity.equals(producto.quantity)) {
-
-                Long quantityChange = previousQuantity != null ?
-                        producto.quantity - previousQuantity :
-                        null; // Primera revisión
-
-                LocalDateTime revisionDate = Instant.ofEpochMilli(timestamp)
-                        .atZone(ZoneId.systemDefault())
-                        .toLocalDateTime();
-
-                quantityChanges.add(new QuantityHistoryDto(
-                        username,
-                        revisionDate,
-                        producto.quantity,
-                        previousQuantity,
-                        quantityChange
-                ));
-            }
-
-            previousQuantity = producto.quantity;
-        }
-
-        return quantityChanges;
     }
 
     public Response updateQuantity(@NotNull Long idProducto, @NotNull Long quantity) {
