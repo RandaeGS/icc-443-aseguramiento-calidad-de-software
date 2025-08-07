@@ -301,6 +301,7 @@ const productMovement = async () => {
             life: 3000
         });
         hideDialog();
+        loadList()
     } catch (error) {
         let errorMessage = error.response.data.message;
         if (errorMessage === 'Minimum stock exceeded') {
@@ -355,8 +356,7 @@ const viewHistory = (val) => {
 };
 
 const getRowClass = (data) => {
-    if (data.quantity <= data.minimumStock * 1.1) {
-        console.log(data);
+    if (data.quantity <= data.minimumStock * 1.2) {
         return '!bg-orange-100';
     }
     return '';
@@ -554,11 +554,21 @@ const getRowClass = (data) => {
             </template>
         </Dialog>
 
-        <Dialog v-model:visible="stockDialog" header="Product Movement" class="lg:w-1/6 sm:w-1/3" :modal="true">
+        <Dialog v-model:visible="stockDialog" header="Product Movement" class="lg:w-1/4 sm:w-1/2" :modal="true">
             <div class="flex flex-col gap-4">
                 <div>
                     <label for="stockProduct" class="block font-bold mb-3">Product</label>
                     <InputText id="stockProduct" name="stockProduct" v-model="product.name" fluid readonly />
+                </div>
+                <div class="grid grid-cols-12 gap-4">
+                    <div class="col-span-6">
+                        <label for="stock" class="block font-bold mb-3">Minimum stock</label>
+                        <InputText id="stock" name="stock" v-model="product.minimumStock" fluid readonly />
+                    </div>
+                    <div class="col-span-6">
+                    <label for="actualStock" class="block font-bold mb-3">Actual stock</label>
+                    <InputText id="actualStock" name="actualStock" v-model="product.quantity" fluid readonly />
+                    </div>
                 </div>
                 <div>
                     <label for="stock" class="block font-bold mb-3">Quantity</label>
