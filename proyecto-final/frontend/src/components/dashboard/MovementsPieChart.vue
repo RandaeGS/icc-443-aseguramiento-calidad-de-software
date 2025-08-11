@@ -1,22 +1,19 @@
 <script setup>
 import { onMounted, ref } from 'vue';
-
-onMounted(() => {
-    chartData.value = setChartData();
-    chartOptions.value = setChartOptions();
-});
+import axiosInstance from '@/plugins/axios';
 
 const chartData = ref();
 const chartOptions = ref();
+const data = ref(null);
 
 const setChartData = () => {
     const documentStyle = getComputedStyle(document.body);
 
     return {
-        labels: ['Fitness', 'Electronics', 'Clothing', 'Accessories'],
+        labels: Object.keys(data.value),
         datasets: [
             {
-                data: [540, 325, 702, 600],
+                data: Object.values(data.value),
                 backgroundColor: [documentStyle.getPropertyValue('--p-cyan-500'), documentStyle.getPropertyValue('--p-orange-500'), documentStyle.getPropertyValue('--p-gray-500'), documentStyle.getPropertyValue('--p-green-500')],
                 hoverBackgroundColor: [documentStyle.getPropertyValue('--p-cyan-400'), documentStyle.getPropertyValue('--p-orange-400'), documentStyle.getPropertyValue('--p-gray-400'), documentStyle.getPropertyValue('--p-green-400')]
             }
@@ -39,6 +36,21 @@ const setChartOptions = () => {
         }
     };
 };
+
+const loadData = async () => {
+    try {
+        const res = await axiosInstance.get('http://localhost:8080/dashboard/movements-per-category');
+        data.value = res.data;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+onMounted(async () => {
+    await loadData();
+    chartData.value = setChartData();
+    chartOptions.value = setChartOptions();
+});
 </script>
 
 <template>

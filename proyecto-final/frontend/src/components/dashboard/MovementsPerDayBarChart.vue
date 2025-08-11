@@ -1,11 +1,13 @@
 <script setup>
 import { useLayout } from '@/layout/composables/layout';
 import { onMounted, ref, watch } from 'vue';
+import axiosInstance from '@/plugins/axios';
 
 const { getPrimary, getSurface, isDarkTheme } = useLayout();
 
 const chartData = ref(null);
 const chartOptions = ref(null);
+const data = ref(null);
 
 function setChartData() {
     const documentStyle = getComputedStyle(document.documentElement);
@@ -15,28 +17,9 @@ function setChartData() {
         datasets: [
             {
                 type: 'bar',
-                label: 'Subscriptions',
+                label: 'Movements',
                 backgroundColor: documentStyle.getPropertyValue('--p-primary-400'),
-                data: [4000, 10000, 15000, 4000],
-                barThickness: 32
-            },
-            {
-                type: 'bar',
-                label: 'Advertising',
-                backgroundColor: documentStyle.getPropertyValue('--p-primary-300'),
-                data: [2100, 8400, 2400, 7500],
-                barThickness: 32
-            },
-            {
-                type: 'bar',
-                label: 'Affiliate',
-                backgroundColor: documentStyle.getPropertyValue('--p-primary-200'),
-                data: [4100, 5200, 3400, 7400],
-                borderRadius: {
-                    topLeft: 8,
-                    topRight: 8
-                },
-                borderSkipped: true,
+                data: data.value,
                 barThickness: 32
             }
         ]
@@ -77,12 +60,22 @@ function setChartOptions() {
     };
 }
 
+const loadData = async () => {
+    try {
+        const res = await axiosInstance.get('http://localhost:8080/dashboard/movements-per-day');
+        data.value = res.data;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
 watch([getPrimary, getSurface, isDarkTheme], () => {
     chartData.value = setChartData();
     chartOptions.value = setChartOptions();
 });
 
-onMounted(() => {
+onMounted(async () => {
+    await loadData();
     chartData.value = setChartData();
     chartOptions.value = setChartOptions();
 });
