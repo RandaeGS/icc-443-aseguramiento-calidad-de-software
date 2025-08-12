@@ -1,7 +1,6 @@
 package com.randaegarcia.service;
 
 import com.randaegarcia.domain.model.ProductCategory;
-import com.randaegarcia.domain.model.Producto;
 import com.randaegarcia.domain.model.StockMovement;
 import com.randaegarcia.domain.model.StockMovement$;
 import com.speedment.jpastreamer.application.JPAStreamer;
@@ -21,6 +20,7 @@ public class DashboardService {
 
     public List<Long> movementsPerDay() {
         Map<DayOfWeek, Long> movementsByDay = jpaStreamer.stream(StockMovement.class)
+                .filter( stockMovement -> stockMovement.producto.isActive == true)
                 .collect(Collectors.groupingBy(
                         o -> o.date.getDayOfWeek(), Collectors.counting()
                 ));
@@ -31,11 +31,13 @@ public class DashboardService {
         movementsByDay.forEach((day, count) -> {
             result[day.ordinal()] += count;
         });
+        jpaStreamer.close();
         return Arrays.asList(result);
     }
 
     public Map<String, Long> movementsPerCategory(){
         Map<String, Long> movementsByCategory = jpaStreamer.stream(StockMovement.class)
+                .filter( stockMovement -> stockMovement.producto.isActive == true)
                 .collect(Collectors.groupingBy(
                         o -> o.producto.category, Collectors.counting()
                 ));
@@ -51,6 +53,7 @@ public class DashboardService {
 
     public Map<String, ?> mostMovedProduct(){
         return jpaStreamer.stream(StockMovement.class)
+                .filter( stockMovement -> stockMovement.producto.isActive == true)
                 .collect(Collectors.groupingBy(
                         o -> o.producto, Collectors.counting()
                 ))
@@ -65,6 +68,7 @@ public class DashboardService {
 
     public Map<String, ?> leastMovedProduct(){
         return jpaStreamer.stream(StockMovement.class)
+                .filter( stockMovement -> stockMovement.producto.isActive == true)
                 .collect(Collectors.groupingBy(
                         o -> o.producto, Collectors.counting()
                 ))
@@ -78,6 +82,7 @@ public class DashboardService {
 
     public Map<String, ?> mostDemandedCategory() {
         return jpaStreamer.stream(StockMovement.class)
+                .filter( stockMovement -> stockMovement.producto.isActive == true)
                 .collect(Collectors.groupingBy(
                         o -> o.producto.category, Collectors.counting()
                 ))
@@ -91,6 +96,7 @@ public class DashboardService {
 
     public Map<String, ?> leastDemandedCategory() {
         return jpaStreamer.stream(StockMovement.class)
+                .filter( stockMovement -> stockMovement.producto.isActive == true)
                 .collect(Collectors.groupingBy(
                         o -> o.producto.category, Collectors.counting()
                 ))
