@@ -1,8 +1,11 @@
 package com.randaegarcia.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -31,7 +34,8 @@ public class Producto extends PanacheEntity {
 
     @NotNull
     @Column(nullable = false)
-    public String category;
+    @Enumerated(EnumType.STRING)
+    public ProductCategory category;
 
     @PositiveOrZero
     @Column(nullable = false)
@@ -47,6 +51,7 @@ public class Producto extends PanacheEntity {
 
     @PositiveOrZero
     @Column(nullable = false)
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER_INT)
     public Long quantity;
 
     @NotNull

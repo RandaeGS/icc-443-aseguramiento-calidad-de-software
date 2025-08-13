@@ -1,37 +1,24 @@
 package com.randaegarcia.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.randaegarcia.domain.dto.PaginatedResponse;
 import com.randaegarcia.domain.dto.ProductoListRequestDto;
-import com.randaegarcia.domain.dto.QuantityHistoryDto;
 import com.randaegarcia.domain.model.Producto;
 import com.randaegarcia.domain.model.StockMovement;
 import com.randaegarcia.domain.model.StockMovement$;
 import com.randaegarcia.exception.ConflictException;
 import com.randaegarcia.exception.StockExceededException;
-import com.randaegarcia.security.CustomRevisionEntity;
 import com.speedment.jpastreamer.application.JPAStreamer;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.jwt.JsonWebToken;
-import org.hibernate.envers.AuditReader;
-import org.hibernate.envers.AuditReaderFactory;
-import org.hibernate.envers.query.AuditEntity;
-import org.hibernate.envers.query.AuditQuery;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -50,7 +37,7 @@ public class ProductoService {
                 jpaStreamer.stream(Producto.class)
                         .filter(Producto::getIsActive)
                         .filter(producto -> producto.getName().toLowerCase().startsWith(requestDto.name().toLowerCase()))
-                        .filter(producto -> producto.getCategory().equals(requestDto.category()) || requestDto.category().isEmpty())
+                        .filter(producto -> producto.getCategory().name().equals(requestDto.category()) || requestDto.category().isEmpty())
                         .filter(producto -> producto.getPrice() >= requestDto.minPrice() && (producto.getPrice() <= requestDto.maxPrice() || requestDto.maxPrice() == -1));
 
         // Conteo total con filtros aplicados

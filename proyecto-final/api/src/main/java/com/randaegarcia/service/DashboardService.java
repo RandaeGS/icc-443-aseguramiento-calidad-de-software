@@ -39,7 +39,7 @@ public class DashboardService {
         Map<String, Long> movementsByCategory = jpaStreamer.stream(StockMovement.class)
                 .filter( stockMovement -> stockMovement.producto.isActive == true)
                 .collect(Collectors.groupingBy(
-                        o -> o.producto.category, Collectors.counting()
+                        o -> o.producto.category.name(), Collectors.counting()
                 ));
 
         Map<String, Long> result = Arrays.stream(ProductCategory.values())

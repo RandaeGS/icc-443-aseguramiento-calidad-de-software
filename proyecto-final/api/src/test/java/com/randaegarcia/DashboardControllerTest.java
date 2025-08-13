@@ -38,15 +38,13 @@ class DashboardControllerTest {
         Producto.deleteAll();
 
         Random random = new Random(42); // Fixed seed for consistent tests
-
-        // Create active products with different categories
         ProductCategory[] categories = ProductCategory.values();
 
         for (int i = 1; i <= 10; i++) {
             Producto producto = new Producto();
             producto.name = "Producto " + String.format("%02d", i);
             producto.description = "Descripción del producto " + i;
-            producto.category = categories[i % categories.length].name();
+            producto.category = categories[i % categories.length];
             producto.price = 100.0 * i;
             producto.cost = 50.0 * i;
             producto.profit = producto.price - producto.cost;
@@ -63,7 +61,7 @@ class DashboardControllerTest {
             Producto producto = new Producto();
             producto.name = "Producto Inactivo " + String.format("%02d", i);
             producto.description = "Descripción del producto inactivo " + i;
-            producto.category = categories[i % categories.length].name();
+            producto.category = categories[i % categories.length];
             producto.price = 100.0 * i;
             producto.cost = 50.0 * i;
             producto.profit = producto.price - producto.cost;
