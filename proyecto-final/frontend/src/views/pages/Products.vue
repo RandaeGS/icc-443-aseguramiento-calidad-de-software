@@ -57,23 +57,22 @@ const hideDialog = () => {
 
 //Validation
 const errors = ref({});
-const productSchema = z.object({
-    id: z.any().optional(),
-    name: z.string().min(3, { message: 'Name is required (min 3 chars)' }),
-    description: z.string().min(3, { message: 'Description is required (min 3 chars)' }),
-    category: z.string().min(1, { message: 'Category is required' }),
-    price: z.number().gt(0, { message: 'Price must be greater than 0' }),
-    cost: z.number().gt(0, { message: 'Cost must be greater than 0' }),
-    quantity: z.number().gte(0, { message: 'Quantity must be 0 or greater' }),
-    minimumStock: z.number().gte(0, { message: 'Minimum stock must be 0 or greater' }),
-    profit: z.number().optional()
-}).refine(
-    (data) => data.quantity >= data.minimumStock,
-    {
+const productSchema = z
+    .object({
+        id: z.any().optional(),
+        name: z.string().min(3, { message: 'Name is required (min 3 chars)' }),
+        description: z.string().min(3, { message: 'Description is required (min 3 chars)' }),
+        category: z.string().min(1, { message: 'Category is required' }),
+        price: z.number().gt(0, { message: 'Price must be greater than 0' }),
+        cost: z.number().gt(0, { message: 'Cost must be greater than 0' }),
+        quantity: z.number().gte(0, { message: 'Quantity must be 0 or greater' }),
+        minimumStock: z.number().gte(0, { message: 'Minimum stock must be 0 or greater' }),
+        profit: z.number().optional()
+    })
+    .refine((data) => data.quantity >= data.minimumStock, {
         message: 'Quantity must be greater than or equal to minimum stock',
-        path: ['quantity'],
-    }
-);
+        path: ['quantity']
+    });
 
 const validateProduct = () => {
     try {
@@ -274,16 +273,35 @@ const paginate = async (paginator) => {
 
 // Stock
 const stockDialog = ref(false);
-const stockQuantity = ref();
-const stockError = ref('')
+const stockQuantity = ref(0);
+const stockErrors = ref({});
+const stockSchema = z.object({
+    stockQuantity: z.number().refine((val) => val !== 0, { message: 'Quantity cannot be 0' })
+});
 
 const showStockDialog = (selectedProduct) => {
     Object.assign(product, selectedProduct);
-    stockError.value = ''
+    stockErrors.value = {};
     stockDialog.value = true;
 };
 
+const validateStockMovement = () => {
+    try {
+        stockSchema.parse({ stockQuantity: stockQuantity.value });
+        stockErrors.value = {};
+        return true;
+    } catch (error) {
+        stockErrors.value = {};
+        error.errors.forEach((err) => {
+            stockErrors.value[err.path[0]] = err.message;
+        });
+        console.log(stockErrors.value);
+        return false;
+    }
+};
+
 const productMovement = async () => {
+    if (!validateStockMovement()) return;
     try {
         await axiosInstance.put(
             `/productos/${product.id}/update-quantity`,
@@ -301,7 +319,7 @@ const productMovement = async () => {
             life: 3000
         });
         hideDialog();
-        loadList()
+        loadList();
     } catch (error) {
         let errorMessage = error.response.data.message;
         if (errorMessage === 'Minimum stock exceeded') {
@@ -360,7 +378,7 @@ const getRowClass = (data) => {
         return '!bg-orange-100';
     }
     return '';
-}
+};
 </script>
 
 <template>
@@ -381,6 +399,7 @@ const getRowClass = (data) => {
             </Toolbar>
 
             <DataTable
+                id="table"
                 ref="dt"
                 dataKey="id"
                 v-model:selection="selectedProducts"
@@ -405,11 +424,11 @@ const getRowClass = (data) => {
                             <span>Low Stock</span>
                         </div>
                         <div class="flex gap-2">
-                            <Button icon="pi pi-filter" @click="filtersDialog = true" />
+                            <Button id="filter" icon="pi pi-filter" @click="filtersDialog = true" />
                             <InputGroup>
                                 <InputText v-model="filters.name" @keyup.enter="loadList" placeholder="Search..." />
                                 <InputGroupAddon>
-                                    <Button icon="pi pi-search" severity="secondary" variant="text" @click="loadList" />
+                                    <Button id="search-button" icon="pi pi-search" severity="secondary" variant="text" @click="loadList" />
                                 </InputGroupAddon>
                             </InputGroup>
                         </div>
@@ -432,20 +451,20 @@ const getRowClass = (data) => {
                 </Column>
                 <Column header="Stock" :exportable="false" style="min-width: 1rem">
                     <template #body="slotProps">
-                        <Button icon="pi pi-arrow-right-arrow-left" outlined rounded class="mr-2" @click="showStockDialog(slotProps.data)" />
+                        <Button icon="pi pi-arrow-right-arrow-left" outlined rounded class="mr-2 update-stock-button" @click="showStockDialog(slotProps.data)" />
                         <Button icon="pi pi-warehouse" outlined rounded severity="info" @click="viewHistory(slotProps.data)" />
                     </template>
                 </Column>
                 <Column header="Actions" :exportable="false" style="min-width: 2rem">
                     <template #body="slotProps">
-                        <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editProduct(slotProps.data)" />
-                        <Button icon="pi pi-trash" outlined rounded severity="danger" @click="confirmDeleteProduct(slotProps.data)" />
+                        <Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-product" @click="editProduct(slotProps.data)" />
+                        <Button icon="pi pi-trash" outlined rounded severity="danger" class="delete-product" @click="confirmDeleteProduct(slotProps.data)" />
                     </template>
                 </Column>
             </DataTable>
         </div>
 
-        <Dialog v-model:visible="productDialog" :style="{ width: '450px' }" header="Product Details" :modal="true">
+        <Dialog id="productDialog" v-model:visible="productDialog" :style="{ width: '450px' }" header="Product Details" :modal="true">
             <Form ref="formRef" :validateOnBlur="true" @submit="product.value?.id === undefined ? saveProduct() : updateProduct()" class="flex flex-col gap-6">
                 <div>
                     <label for="name" class="block font-bold mb-3">Name</label>
@@ -467,7 +486,7 @@ const getRowClass = (data) => {
                     </div>
                     <div class="col-span-6">
                         <label for="minimumStock" class="block font-bold mb-3">Min. Stock</label>
-                        <InputNumber id="minimumStock" name="minimumStock" v-model="product.minimumStock"  fluid />
+                        <InputNumber id="minimumStock" name="minimumStock" v-model="product.minimumStock" fluid />
                         <small v-if="errors.minimumStock" class="text-red-500">{{ errors.minimumStock }}.</small>
                     </div>
                 </div>
@@ -529,7 +548,7 @@ const getRowClass = (data) => {
             </template>
         </Dialog>
 
-        <Dialog v-model:visible="filtersDialog" header="Filters" :modal="true">
+        <Dialog id="filters-dialog" v-model:visible="filtersDialog" header="Filters" :modal="true">
             <div class="flex flex-col gap-4">
                 <div>
                     <label for="categoryFilter" class="block font-bold mb-3">Category</label>
@@ -554,7 +573,7 @@ const getRowClass = (data) => {
             </template>
         </Dialog>
 
-        <Dialog v-model:visible="stockDialog" header="Product Movement" class="lg:w-1/4 sm:w-1/2" :modal="true">
+        <Dialog id="stockDialog" v-model:visible="stockDialog" header="Product Movement" class="lg:w-1/4 sm:w-1/2" :modal="true">
             <div class="flex flex-col gap-4">
                 <div>
                     <label for="stockProduct" class="block font-bold mb-3">Product</label>
@@ -563,17 +582,17 @@ const getRowClass = (data) => {
                 <div class="grid grid-cols-12 gap-4">
                     <div class="col-span-6">
                         <label for="stock" class="block font-bold mb-3">Minimum stock</label>
-                        <InputText id="stock" name="stock" v-model="product.minimumStock" fluid readonly />
+                        <InputText id="minimumStock" name="stock" v-model="product.minimumStock" fluid readonly />
                     </div>
                     <div class="col-span-6">
-                    <label for="actualStock" class="block font-bold mb-3">Actual stock</label>
-                    <InputText id="actualStock" name="actualStock" v-model="product.quantity" fluid readonly />
+                        <label for="actualStock" class="block font-bold mb-3">Actual stock</label>
+                        <InputText id="actualStock" name="actualStock" v-model="product.quantity" fluid readonly />
                     </div>
                 </div>
                 <div>
                     <label for="stock" class="block font-bold mb-3">Quantity</label>
-                    <InputNumber id="stock" name="stock" v-model="stockQuantity" fluid autofocus />
-                    <small v-if="stockError.length > 0" class="text-red-500 block">{{ stockError }}.</small>
+                    <InputNumber input-id="stockQuantity" name="stockQuantity" v-model="stockQuantity" fluid />
+                    <small v-if="stockErrors.stockQuantity" class="text-red-500 block">{{ stockErrors.stockQuantity }}.</small>
                 </div>
             </div>
 
