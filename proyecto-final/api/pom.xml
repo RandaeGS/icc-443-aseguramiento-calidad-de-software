@@ -111,6 +111,11 @@
             <artifactId>quarkus-devservices-postgresql</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.quarkiverse.cucumber</groupId>
+            <artifactId>quarkus-cucumber</artifactId>
+            <version>1.3.0</version>
+        </dependency>
     </dependencies>
 
     <build>
