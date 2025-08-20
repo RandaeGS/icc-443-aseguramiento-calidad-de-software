@@ -9,6 +9,6 @@ RUN mvn package -DskipTests
 # ---- Etapa 2: Run ----
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
-COPY --from=build /app/target/api-1.0-SNAPSHOT.jar app.jar
+COPY --from=build /app/target/quarkus-app/ ./
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Dquarkus.profile=test", "-jar", "quarkus-run.jar"]

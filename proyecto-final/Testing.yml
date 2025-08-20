@@ -1,0 +1,177 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: postgres_test_db
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: development
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+      - ./scripts:/docker-entrypoint-initdb.d
+    networks:
+      - test-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U dev -d development" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.3
+    container_name: keycloak_test
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/development
+      KC_DB_USERNAME: dev
+      KC_DB_PASSWORD: 123456
+      KC_HOSTNAME_PORT: 7080
+      KC_HOSTNAME: localhost
+      KC_DB_SCHEMA: keycloak
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "7080:8080"
+    command:
+      - start-dev
+    networks:
+      - test-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health/ready" ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  quarkus-app:
+    build:
+      context: ./api
+      dockerfile: Dockerfile.test
+    container_name: quarkus_test_app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    networks:
+      - test-network
+    environment:
+      - QUARKUS_PROFILE=test
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/q/health/ready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  frontend-app:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend_test_app
+    depends_on:
+      quarkus-app:
+        condition: service_healthy
+    ports:
+      - "5173:5173"
+    networks:
+      - test-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:5173" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  quarkus-unit-tests:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: quarkus_unit_tests
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - test-network
+    environment:
+      - QUARKUS_PROFILE=test
+    command: ["mvn", "test"]
+    volumes:
+      - ./api/target/surefire-reports:/app/target/surefire-reports
+      - ./test-results:/test-results
+    restart: "no"
+
+  quarkus-acceptance-tests:
+    build:
+      context: ./api
+      dockerfile: Dockerfile.test
+    container_name: quarkus_acceptance_tests
+    depends_on:
+      quarkus-app:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    networks:
+      - test-network
+    environment:
+      - QUARKUS_PROFILE=test
+      - TEST_URL=http://quarkus-app:8080
+    command: ["mvn", "test", "-Dtest=**/*AcceptanceTest"]
+    volumes:
+      - ./api/target/surefire-reports:/app/target/surefire-reports
+      - ./test-results:/test-results
+    restart: "no"
+
+  playwright-tests:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.playwright
+    container_name: playwright_e2e_tests
+    depends_on:
+      frontend-app:
+        condition: service_healthy
+      quarkus-app:
+        condition: service_healthy
+    networks:
+      - test-network
+    environment:
+      - PLAYWRIGHT_BASE_URL=http://frontend-app:5173
+      - API_BASE_URL=http://quarkus-app:8080
+    command: ["npx", "playwright", "test"]
+    volumes:
+      - ./frontend/test-results:/app/test-results
+      - ./frontend/playwright-report:/app/playwright-report
+      - ./test-results:/test-results
+    restart: "no"
+
+  # Orquestador de tests
+  test-runner:
+    image: alpine:latest
+    container_name: test_orchestrator
+    depends_on:
+      quarkus-unit-tests:
+        condition: service_completed_successfully
+      quarkus-acceptance-tests:
+        condition: service_completed_successfully
+      playwright-tests:
+        condition: service_completed_successfully
+    command: >
+      sh -c "
+        echo '✅ Todos los tests completados exitosamente';
+        echo '📊 Resultados disponibles en ./test-results/';
+        exit 0
+      "
+    volumes:
+      - ./test-results:/test-results
+    restart: "no"
+
+networks:
+  test-network:
+    driver: bridge
+
+volumes:
+  postgres_test_data:

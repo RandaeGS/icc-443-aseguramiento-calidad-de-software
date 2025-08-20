@@ -1,0 +1,9 @@
+# Dockerfile para tests E2E con Playwright
+FROM mcr.microsoft.com/playwright:v1.40.0-focal
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm install
+COPY . .
+# Instalar navegadores de Playwright
+RUN npx playwright install
+CMD ["npx", "playwright", "test"]
