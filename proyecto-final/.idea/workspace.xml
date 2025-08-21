@@ -4,8 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3b5699db-3dea-4731-ae22-b373e9b7fc6f" name="Changes" comment="advance dockerization">
+    <list default="true" id="3b5699db-3dea-4731-ae22-b373e9b7fc6f" name="Changes" comment="advance production dockerization">
+      <change afterPath="$PROJECT_DIR$/.env" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/production/init-keycloak-schema-prod.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Development.yml" beforeDir="false" afterPath="$PROJECT_DIR$/Development.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Production.yml" beforeDir="false" afterPath="$PROJECT_DIR$/Production.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/api/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/plugins/axios.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/plugins/axios.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/plugins/keycloak.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/plugins/keycloak.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/init-keycloak-schema.sql" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/development/init-keycloak-schema.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,37 +39,38 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Docker.Development.yml.api: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.Development.yml.backend-api: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.Development.yml.postgres: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.Development.yml: Compose Deployment.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.api/Dockerfile.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;SONARLINT_PRECOMMIT_ANALYSIS&quot;: &quot;true&quot;,
-    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/randaegs/github/icc-443-aseguramiento-calidad-de-software/proyecto-final/api&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Docker.Development.yml.api: Compose Deployment.executor": "Run",
+    "Docker.Development.yml.backend-api: Compose Deployment.executor": "Run",
+    "Docker.Development.yml.postgres: Compose Deployment.executor": "Run",
+    "Docker.Development.yml: Compose Deployment.executor": "Run",
+    "Docker.Production.yml: Compose Deployment.executor": "Run",
+    "Docker.api/Dockerfile.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SONARLINT_PRECOMMIT_ANALYSIS": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/home/randaegs/github/icc-443-aseguramiento-calidad-de-software/proyecto-final/api",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/api" />
     </key>
   </component>
-  <component name="RunManager" selected="Docker.Development.yml.postgres: Compose Deployment">
+  <component name="RunManager" selected="Docker.Production.yml: Compose Deployment">
     <configuration name="Development.yml: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
       <deployment type="docker-compose.yml">
         <settings>
@@ -82,19 +92,6 @@
       </deployment>
       <method v="2" />
     </configuration>
-    <configuration name="Development.yml.backend-api: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
-      <deployment type="docker-compose.yml">
-        <settings>
-          <option name="services">
-            <list>
-              <option value="backend-api" />
-            </list>
-          </option>
-          <option name="sourceFilePath" value="Development.yml" />
-        </settings>
-      </deployment>
-      <method v="2" />
-    </configuration>
     <configuration name="Development.yml.postgres: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
       <deployment type="docker-compose.yml">
         <settings>
@@ -104,6 +101,14 @@
             </list>
           </option>
           <option name="sourceFilePath" value="Development.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="Production.yml: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="sourceFilePath" value="Production.yml" />
         </settings>
       </deployment>
       <method v="2" />
@@ -131,11 +136,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Docker.Production.yml: Compose Deployment" />
         <item itemvalue="Docker.Development.yml.postgres: Compose Deployment" />
         <item itemvalue="Docker.Development.yml: Compose Deployment" />
         <item itemvalue="Docker.Development.yml.api: Compose Deployment" />
         <item itemvalue="Docker.api/Dockerfile" />
-        <item itemvalue="Docker.Development.yml.backend-api: Compose Deployment" />
       </list>
     </recent_temporary>
   </component>
@@ -164,6 +169,7 @@
       <workItem from="1755658597161" duration="640000" />
       <workItem from="1755660116727" duration="1791000" />
       <workItem from="1755710477581" duration="10198000" />
+      <workItem from="1755800223818" duration="4778000" />
     </task>
     <task id="LOCAL-00001" summary="init dockerization">
       <option name="closed" value="true" />
@@ -205,7 +211,15 @@
       <option name="project" value="LOCAL" />
       <updated>1755653466635</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="advance production dockerization">
+      <option name="closed" value="true" />
+      <created>1755811565508</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1755811565508</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -214,12 +228,24 @@
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.jmx" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="init dockerization" />
     <MESSAGE value="fix: quarkus dockerfile" />
     <MESSAGE value="fix: development docker-compose" />
     <MESSAGE value="advance dockerization" />
-    <option name="LAST_COMMIT_MESSAGE" value="advance dockerization" />
+    <MESSAGE value="advance production dockerization" />
+    <option name="LAST_COMMIT_MESSAGE" value="advance production dockerization" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
