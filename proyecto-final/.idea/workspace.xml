@@ -4,13 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3b5699db-3dea-4731-ae22-b373e9b7fc6f" name="Changes" comment="keycloack container now working">
+    <list default="true" id="3b5699db-3dea-4731-ae22-b373e9b7fc6f" name="Changes" comment="advance observability implementation">
+      <change afterPath="$PROJECT_DIR$/prometheus.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Production.yml" beforeDir="false" afterPath="$PROJECT_DIR$/Production.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/api/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/api/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/main.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/plugins/keycloak.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/plugins/keycloak.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/otel-collector-config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/otel-collector-config.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -170,7 +169,7 @@
       <workItem from="1755880056303" duration="2309000" />
       <workItem from="1755882538819" duration="2311000" />
       <workItem from="1755898956669" duration="8430000" />
-      <workItem from="1756004582013" duration="5693000" />
+      <workItem from="1756004582013" duration="9343000" />
     </task>
     <task id="LOCAL-00001" summary="init dockerization">
       <option name="closed" value="true" />
@@ -228,7 +227,15 @@
       <option name="project" value="LOCAL" />
       <updated>1755818393840</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="advance observability implementation">
+      <option name="closed" value="true" />
+      <created>1756010856687</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1756010856687</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -255,7 +262,8 @@
     <MESSAGE value="advance dockerization" />
     <MESSAGE value="advance production dockerization" />
     <MESSAGE value="keycloack container now working" />
-    <option name="LAST_COMMIT_MESSAGE" value="keycloack container now working" />
+    <MESSAGE value="advance observability implementation" />
+    <option name="LAST_COMMIT_MESSAGE" value="advance observability implementation" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
