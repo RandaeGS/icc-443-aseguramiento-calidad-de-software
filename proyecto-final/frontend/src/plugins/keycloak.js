@@ -3,7 +3,8 @@ import Keycloak from 'keycloak-js';
 const keycloak = new Keycloak({
     url: import.meta.env.VITE_KEYCLOAK_URL || 'http://localhost:7080',
     realm: 'project',
-    clientId: 'vue'
+    clientId: 'vue',
+    scope: 'openid profile email uma_authorization'
 });
 
 export const initKeycloak = async () => {

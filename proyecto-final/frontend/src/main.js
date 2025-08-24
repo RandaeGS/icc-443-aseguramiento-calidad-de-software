@@ -23,7 +23,8 @@ app.use(VueKeyCloak, {
     config: {
         url: 'http://localhost:7080',
         realm: 'project',
-        clientId: 'vue'
+        clientId: 'vue',
+        scope: 'openid profile email uma_authorization'
     },
     onReady: () => {
         console.log('App is ready!');

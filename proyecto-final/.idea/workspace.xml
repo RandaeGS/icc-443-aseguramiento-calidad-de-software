@@ -4,10 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3b5699db-3dea-4731-ae22-b373e9b7fc6f" name="Changes" comment="advance production dockerization">
+    <list default="true" id="3b5699db-3dea-4731-ae22-b373e9b7fc6f" name="Changes" comment="keycloack container now working">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Production.yml" beforeDir="false" afterPath="$PROJECT_DIR$/Production.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/api/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/api/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/api/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/main.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/plugins/keycloak.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/plugins/keycloak.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,6 +58,7 @@
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/opt/intellij-idea-ultimate-edition/plugins/javascript-plugin/jsLanguageServicesImpl/external&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -129,11 +133,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Docker.api/Dockerfile" />
         <item itemvalue="Docker.Production.yml: Compose Deployment" />
         <item itemvalue="Docker.Development.yml.postgres: Compose Deployment" />
-        <item itemvalue="Docker.Development.yml: Compose Deployment" />
         <item itemvalue="Docker.Development.yml.api: Compose Deployment" />
-        <item itemvalue="Docker.api/Dockerfile" />
+        <item itemvalue="Docker.Development.yml: Compose Deployment" />
       </list>
     </recent_temporary>
   </component>
@@ -163,6 +167,10 @@
       <workItem from="1755660116727" duration="1791000" />
       <workItem from="1755710477581" duration="10198000" />
       <workItem from="1755800223818" duration="4778000" />
+      <workItem from="1755880056303" duration="2309000" />
+      <workItem from="1755882538819" duration="2311000" />
+      <workItem from="1755898956669" duration="8430000" />
+      <workItem from="1756004582013" duration="5693000" />
     </task>
     <task id="LOCAL-00001" summary="init dockerization">
       <option name="closed" value="true" />
@@ -212,7 +220,15 @@
       <option name="project" value="LOCAL" />
       <updated>1755811565508</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="keycloack container now working">
+      <option name="closed" value="true" />
+      <created>1755818393840</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1755818393840</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -238,7 +254,8 @@
     <MESSAGE value="fix: development docker-compose" />
     <MESSAGE value="advance dockerization" />
     <MESSAGE value="advance production dockerization" />
-    <option name="LAST_COMMIT_MESSAGE" value="advance production dockerization" />
+    <MESSAGE value="keycloack container now working" />
+    <option name="LAST_COMMIT_MESSAGE" value="keycloack container now working" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
