@@ -5,11 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3b5699db-3dea-4731-ae22-b373e9b7fc6f" name="Changes" comment="advance observability implementation">
-      <change afterPath="$PROJECT_DIR$/prometheus.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Production.yml" beforeDir="false" afterPath="$PROJECT_DIR$/Production.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Proyecto_Final.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/Proyecto_Final.pdf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/api/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/otel-collector-config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/otel-collector-config.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -169,7 +167,8 @@
       <workItem from="1755880056303" duration="2309000" />
       <workItem from="1755882538819" duration="2311000" />
       <workItem from="1755898956669" duration="8430000" />
-      <workItem from="1756004582013" duration="9343000" />
+      <workItem from="1756004582013" duration="10017000" />
+      <workItem from="1756146199129" duration="10000" />
     </task>
     <task id="LOCAL-00001" summary="init dockerization">
       <option name="closed" value="true" />

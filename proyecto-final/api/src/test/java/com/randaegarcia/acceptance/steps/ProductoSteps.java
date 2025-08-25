@@ -21,7 +21,6 @@ public class ProductoSteps {
     private String accessToken;
     private Long createdProductId;
 
-    @Before
     public void setup() {
         // Fetch JWT token before each test
         try {
