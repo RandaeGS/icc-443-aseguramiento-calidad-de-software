@@ -20,5 +20,5 @@ jobs:
           cache: maven
 
       - name: Test api
-        working-directory: ./api
+        working-directory: ./proyecto-final/api
         run: mvn test
