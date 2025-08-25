@@ -21,4 +21,11 @@ jobs:
 
       - name: Test api
         working-directory: ./proyecto-final/api
-        run: mvn test
+        run: mvn test jacoco:report
+
+      - name: Upload coverage report
+        working-directory: ./proyecto-final/api
+        uses: actions/upload-artifact@v2
+        with:
+          name: jacoco-report
+          path: target/site/jacoco
