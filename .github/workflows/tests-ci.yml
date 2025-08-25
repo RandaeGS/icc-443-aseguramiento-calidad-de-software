@@ -29,4 +29,4 @@ jobs:
           name: jacoco-report
           path: target/site/jacoco
           retention-days: 15
-          working-directory: ./proyecto-final/api
+          working-directory: './proyecto-final/api'
